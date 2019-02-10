@@ -1,7 +1,7 @@
 // MyD3D11Project.cpp : Defines the entry point for the application.
 //
-
 #include "stdafx.h"
+#include <crtdbg.h>  
 #include "MyD3D11Project.h"
 #include "GraphicsEngine.h"
 
@@ -27,6 +27,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
     // Initialize global strings
     LoadStringW(hInstance, IDC_MYD3D11PROJECT, szWindowClass, MAX_LOADSTRING);

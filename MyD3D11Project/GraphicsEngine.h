@@ -1,6 +1,7 @@
 #ifndef GRAPHICSENGINE_H
 #define GRAPHICSENGINE_H
 
+// forward declarations
 struct IDXGISwapChain;
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -9,6 +10,7 @@ struct ID3D11RenderTargetView;
 struct ID3D11Buffer;
 struct ID3D11VertexShader;
 struct ID3D11PixelShader;
+struct ID3D10Blob;
 
 class GraphicsEngine
 {
@@ -25,6 +27,9 @@ protected:
 	ID3D11RenderTargetView* m_rtw;
 	ID3D11Buffer*			m_vertexBuffer;
 
+	ID3D10Blob*				m_VSBlob;
+	ID3D10Blob*				m_PSBlob;
+
 	ID3D11VertexShader*		m_vertexshader;
 	ID3D11PixelShader*		m_pixelshader;
 
@@ -32,7 +37,18 @@ protected:
 	bool setupRenderTargetView();
 	bool setupViewport();
 
+	HRESULT setInputLayout();
+
+	// shaders
+	HRESULT createVertexShader();
+	HRESULT createPixelShader();
+
+	// buffers
+	HRESULT createAndSetVertexBuffer();
+
 	void createTriangle();
+
+	void resetToNullptr();
 };
 
 #endif // !GRAPHICSENGINE_H
