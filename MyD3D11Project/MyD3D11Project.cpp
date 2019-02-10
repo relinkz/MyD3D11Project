@@ -3,26 +3,20 @@
 
 #include "stdafx.h"
 #include "MyD3D11Project.h"
-#include <D3D11.h>
+#include "GraphicsEngine.h"
 
 #define MAX_LOADSTRING 100
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-
-IDXGISwapChain*			m_sc = nullptr;
-ID3D11Device*			m_device = nullptr;
-ID3D11DeviceContext*	m_deviceContext = nullptr;
-ID3D11Texture2D*		pBackbuffer = nullptr;
-ID3D11RenderTargetView* m_rtw = nullptr;
+GraphicsEngine gEngine;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-void Render();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -58,14 +52,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		else
 		{
-			Render();
+			gEngine.Render();
 		}
 	}
 	
     return (int) msg.wParam;
 }
-
-
 
 //
 //  FUNCTION: MyRegisterClass()
@@ -115,62 +107,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-   DXGI_SWAP_CHAIN_DESC swapChainDesc;
-   ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
-
-   swapChainDesc.BufferCount = 1;
-   swapChainDesc.BufferDesc.Width = 640;
-   swapChainDesc.BufferDesc.Height = 480;
-   swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-   swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
-   swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-   swapChainDesc.OutputWindow = hWnd;
-   swapChainDesc.SampleDesc.Count = 1;
-   swapChainDesc.SampleDesc.Quality = 0;
-   swapChainDesc.Windowed = TRUE;
-
-   D3D_FEATURE_LEVEL requestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
-   UINT numLevelsRequested = 1;
-   D3D_FEATURE_LEVEL featureLevelsSupported;
-
-
-   HRESULT res = D3D11CreateDeviceAndSwapChain(
-	   NULL, 
-	   D3D_DRIVER_TYPE_HARDWARE, 
-	   NULL,
-	   0, 
-	   &requestedFeatureLevel,
-	   numLevelsRequested,
-	   D3D11_SDK_VERSION, 
-	   &swapChainDesc, 
-	   &m_sc, 
-	   &m_device, 
-	   &featureLevelsSupported,
-	   &m_deviceContext);
-
-   if ( FAILED(res))
-   {
-	   return FALSE;
-   }
-
-   res = m_sc->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackbuffer);
-   if (FAILED(res))
-	   return FALSE;
-
-   res = m_device->CreateRenderTargetView(pBackbuffer, NULL, &m_rtw);
-   if (FAILED(res))
-	   return FALSE;
-
-   m_deviceContext->OMSetRenderTargets(1, &m_rtw, NULL);
-
-   D3D11_VIEWPORT vp;
-   vp.Width = static_cast<float>(swapChainDesc.BufferDesc.Width);
-   vp.Height = static_cast<float>(swapChainDesc.BufferDesc.Height);
-   vp.MinDepth = 0.0f;
-   vp.MaxDepth = 1.0f;
-   vp.TopLeftX = 0;
-   vp.TopLeftY = 0;
-   m_deviceContext->RSSetViewports(1, &vp);
+   gEngine.Init(hWnd);
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
@@ -244,12 +181,4 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
-}
-
-void Render()
-{
-	float clearColor[4] = { 0.6f, 0.125f, 0.0f, 1.0f };  // RGBA
-	m_deviceContext->ClearRenderTargetView(m_rtw, clearColor);
-
-	m_sc->Present(0,0);
 }
