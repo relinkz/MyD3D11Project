@@ -8,6 +8,12 @@ GraphicsEngine::~GraphicsEngine()
 
 void GraphicsEngine::Init(HWND & hWnd)
 {
+	m_sc			= nullptr;
+	m_device		= nullptr;
+	m_deviceContext = nullptr;
+	m_backbuffer	= nullptr;
+	m_rtw			= nullptr;
+
 	CreateSwapChainDeviceAndContext(hWnd);
 
 	SetupRenderTargetView();
@@ -63,7 +69,7 @@ bool GraphicsEngine::CreateSwapChainDeviceAndContext(HWND &hWnd)
 		return FALSE;
 	}
 
-	res = m_sc->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackbuffer);
+	res = m_sc->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&m_backbuffer);
 	if (FAILED(res))
 		return FALSE;
 
@@ -72,7 +78,7 @@ bool GraphicsEngine::CreateSwapChainDeviceAndContext(HWND &hWnd)
 
 bool GraphicsEngine::SetupRenderTargetView()
 {
-	HRESULT res = m_device->CreateRenderTargetView(pBackbuffer, NULL, &m_rtw);
+	HRESULT res = m_device->CreateRenderTargetView(m_backbuffer, NULL, &m_rtw);
 	if (FAILED(res))
 		return false;
 
