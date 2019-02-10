@@ -6,6 +6,9 @@ struct ID3D11Device;
 struct ID3D11DeviceContext;
 struct ID3D11Texture2D;
 struct ID3D11RenderTargetView;
+struct ID3D11Buffer;
+struct ID3D11VertexShader;
+struct ID3D11PixelShader;
 
 class GraphicsEngine
 {
@@ -20,10 +23,16 @@ protected:
 	ID3D11DeviceContext*	m_deviceContext;
 	ID3D11Texture2D*		m_backbuffer;
 	ID3D11RenderTargetView* m_rtw;
+	ID3D11Buffer*			m_vertexBuffer;
 
-	bool CreateSwapChainDeviceAndContext(HWND &hWnd);
-	bool SetupRenderTargetView();
-	bool SetupViewport();
+	ID3D11VertexShader*		m_vertexshader;
+	ID3D11PixelShader*		m_pixelshader;
+
+	bool createSwapChainDeviceAndContext(HWND &hWnd);
+	bool setupRenderTargetView();
+	bool setupViewport();
+
+	void createTriangle();
 };
 
 #endif // !GRAPHICSENGINE_H
