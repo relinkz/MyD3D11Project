@@ -203,7 +203,7 @@ HRESULT GraphicsEngine::createVertexShader()
 
 	ID3DBlob* pVSBlobErr = nullptr;
 
-	hr = D3DX11CompileFromFile(L"Tutorial02.fx", NULL, NULL, "VS", "vs_4_0", NULL, (1 << 0), 0, &m_VSBlob, &pVSBlobErr, NULL);
+	hr = D3DX11CompileFromFile(L"VertexShader.hlsl", NULL, NULL, "main", "vs_4_0", NULL, (1 << 0), 0, &m_VSBlob, &pVSBlobErr, NULL);
 
 	if (FAILED(hr))
 	{
@@ -231,7 +231,7 @@ HRESULT GraphicsEngine::createPixelShader()
 
 	ID3DBlob* pPSBlobErr = nullptr;
 
-	hr = D3DX11CompileFromFile(L"Tutorial02.fx", NULL, NULL, "PS", "ps_4_0", NULL, (1 << 0), 0, &m_PSBlob, &pPSBlobErr, NULL);
+	hr = D3DX11CompileFromFile(L"PixelShader.hlsl", NULL, NULL, "main", "ps_4_0", NULL, (1 << 0), 0, &m_PSBlob, &pPSBlobErr, NULL);
 
 	if (FAILED(hr))
 	{
