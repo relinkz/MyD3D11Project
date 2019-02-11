@@ -1,6 +1,8 @@
 #ifndef GRAPHICSENGINE_H
 #define GRAPHICSENGINE_H
 
+#include <DirectXMath.h>
+
 // forward declarations
 struct IDXGISwapChain;
 struct ID3D11Device;
@@ -33,6 +35,11 @@ protected:
 	ID3D11VertexShader*		m_vertexshader;
 	ID3D11PixelShader*		m_pixelshader;
 
+	// matrixes
+	DirectX::XMMATRIX m_world;
+	DirectX::XMMATRIX m_view;
+	DirectX::XMMATRIX m_projection;
+
 	bool createSwapChainDeviceAndContext(HWND &hWnd);
 	bool setupRenderTargetView();
 	bool setupViewport();
@@ -45,6 +52,7 @@ protected:
 
 	// buffers
 	HRESULT createAndSetVertexBuffer();
+	void setupMatrixes();
 
 	void createTriangle();
 

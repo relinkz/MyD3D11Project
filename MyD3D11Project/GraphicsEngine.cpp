@@ -77,6 +77,8 @@ void GraphicsEngine::Init(HWND & hWnd)
 
 	setupViewport();
 
+	setupMatrixes();
+
 	createTriangle();
 }
 
@@ -290,6 +292,24 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 	m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return hr;
+}
+
+void GraphicsEngine::setupMatrixes()
+{
+	// World matrix
+	this->m_world = DirectX::XMMatrixIdentity();
+
+	// View Matrix
+	DirectX::XMVECTOR eye	= DirectX::XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
+	DirectX::XMVECTOR at	= DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	DirectX::XMVECTOR up	= DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	m_view = DirectX::XMMatrixLookAtLH(eye, at, up);
+
+	// projectionMatrix
+	float aspectRatio = 640.0f / 480.0f;
+
+	m_projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, aspectRatio, 0.01f, 100.0f );
 }
 
 void GraphicsEngine::createTriangle()
