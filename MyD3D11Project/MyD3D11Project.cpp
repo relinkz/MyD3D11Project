@@ -40,6 +40,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 	
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MYD3D11PROJECT));
+	if (!hAccelTable)
+	{
+		return FALSE;
+	}
 
 	MSG msg = {0};
 
@@ -151,6 +155,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
+			if (!hdc)
+			{
+				return FALSE;
+			}
             // TODO: Add any drawing code that uses hdc here...
             EndPaint(hWnd, &ps);
         }

@@ -170,17 +170,11 @@ HRESULT GraphicsEngine::setInputLayout()
 {
 	HRESULT hr = S_OK;
 
+	//SemanticName, SemanticIndex, Format, Inputslot, AlignedByByteOffset, InputSlotClass, InstanceDataStepRate
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
-		{
-			"POSITION",						// SemanticName
-			0,								// SemanticIndex
-			DXGI_FORMAT_R32G32B32_FLOAT, // Format
-			0,								// InputSlot
-			0,								// AlignedByteOffset
-			D3D11_INPUT_PER_VERTEX_DATA,	// InputSlotClass
-			0								// InstanceDataStepRate
-		}
+		{ "POSITION",	0,	DXGI_FORMAT_R32G32B32_FLOAT,	0,	0,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR",		0,	DXGI_FORMAT_R32G32B32A32_FLOAT, 0,	12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	UINT numElements = ARRAYSIZE(layout);
@@ -254,13 +248,14 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 	struct SimpleVertex
 	{
 		DirectX::XMFLOAT3 pos;
+		DirectX::XMFLOAT4 color;
 	};
 
 	SimpleVertex vertices[] =
 	{
-		DirectX::XMFLOAT3(0.0f, 0.5f, 0.5f),
-		DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f),
-		DirectX::XMFLOAT3(-0.5f, -0.5f, 0.5f),
+		{ DirectX::XMFLOAT3(0.0f, 0.5f, 0.5f),		DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f),		DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0.5f),	DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
 	};
 
 
