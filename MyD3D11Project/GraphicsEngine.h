@@ -35,6 +35,8 @@ protected:
 	ID3D11VertexShader*		m_vertexshader;
 	ID3D11PixelShader*		m_pixelshader;
 
+	UINT					m_nrOfVertices;
+
 	// matrixes
 	DirectX::XMMATRIX m_world;
 	DirectX::XMMATRIX m_view;

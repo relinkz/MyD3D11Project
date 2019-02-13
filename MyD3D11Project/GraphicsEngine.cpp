@@ -89,7 +89,7 @@ void GraphicsEngine::Render()
 
 	m_deviceContext->VSSetShader(m_vertexshader, NULL, 0);
 	m_deviceContext->PSSetShader(m_pixelshader, NULL, 0);
-	m_deviceContext->Draw(3, 0);
+	m_deviceContext->Draw(m_nrOfVertices, 0);
 
 	m_sc->Present(0, 0);
 }
@@ -253,16 +253,28 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 
 	SimpleVertex vertices[] =
 	{
-		{ DirectX::XMFLOAT3(0.0f, 0.5f, 0.5f),		DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f),		DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0.5f),	DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		// top
+		{ DirectX::XMFLOAT3(0.0f, 0.4f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(0.2f, 0.0f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-0.2f, 0.0f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
+
+		// left
+		{ DirectX::XMFLOAT3(-0.2f, 0.0f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(0.0f, -0.4f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-0.4f, -0.4f, 0.5f),	DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
+
+		// right
+		{ DirectX::XMFLOAT3(0.2f, 0.0f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(0.4f, -0.4f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-0.0f, -0.4f, 0.5f),	DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
 	};
 
+	m_nrOfVertices = ARRAYSIZE(vertices);
 
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(SimpleVertex) * 3;
+	bd.ByteWidth = sizeof(SimpleVertex) * m_nrOfVertices;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 	bd.MiscFlags = 0;
