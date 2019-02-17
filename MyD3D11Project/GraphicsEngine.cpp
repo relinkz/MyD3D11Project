@@ -4,6 +4,19 @@
 #include <DirectXMath.h>
 #include <D3DX11async.h>
 
+struct SimpleVertex
+{
+	DirectX::XMFLOAT3 pos;
+	DirectX::XMFLOAT4 color;
+};
+
+struct ConstantBuffer
+{
+	DirectX::XMMATRIX mWorld;
+	DirectX::XMMATRIX mView;
+	DirectX::XMMATRIX mProjection;
+};
+
 GraphicsEngine::~GraphicsEngine()
 {
 	if (m_sc)
@@ -40,6 +53,18 @@ GraphicsEngine::~GraphicsEngine()
 	{
 		m_vertexBuffer->Release();
 		m_vertexBuffer = nullptr;
+	}
+
+	if (m_indexBuffer)
+	{
+		m_indexBuffer->Release();
+		m_indexBuffer = nullptr;
+	}
+
+	if (m_constantBuffer)
+	{
+		m_constantBuffer->Release();
+		m_indexBuffer = nullptr;
 	}
 
 	if (m_VSBlob)
@@ -86,10 +111,13 @@ void GraphicsEngine::Render()
 {
 	float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // RGBA
 	m_deviceContext->ClearRenderTargetView(m_rtw, clearColor);
+	
+	this->updateConstantBuffers();
 
 	m_deviceContext->VSSetShader(m_vertexshader, NULL, 0);
+	m_deviceContext->VSSetConstantBuffers(0, 1, &m_constantBuffer);
 	m_deviceContext->PSSetShader(m_pixelshader, NULL, 0);
-	m_deviceContext->Draw(m_nrOfVertices, 0);
+	m_deviceContext->DrawIndexed(m_nrIndices, 0, 0);
 
 	m_sc->Present(0, 0);
 }
@@ -245,36 +273,23 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 {
 	HRESULT hr = S_OK;
 
-	struct SimpleVertex
-	{
-		DirectX::XMFLOAT3 pos;
-		DirectX::XMFLOAT4 color;
-	};
-
 	SimpleVertex vertices[] =
 	{
-		// top
-		{ DirectX::XMFLOAT3(0.0f, 0.4f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(0.2f, 0.0f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(-0.2f, 0.0f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-
-		// left
-		{ DirectX::XMFLOAT3(-0.2f, 0.0f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(0.0f, -0.4f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(-0.4f, -0.4f, 0.5f),	DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-
-		// right
-		{ DirectX::XMFLOAT3(0.2f, 0.0f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(0.4f, -0.4f, 0.5f),		DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(-0.0f, -0.4f, 0.5f),	DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-1.0f, 1.0f, -1.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(1.0f, 1.0f, -1.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-1.0f, 1.0f, 1.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-1.0f, -1.0f, -1.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(1.0f, -1.0f, -1.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(1.0f, -1.0f, 1.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-1.0f, -1.0f, 1.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) },
 	};
-
-	m_nrOfVertices = ARRAYSIZE(vertices);
-
+	
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(SimpleVertex) * m_nrOfVertices;
+	bd.ByteWidth = sizeof(SimpleVertex) * ARRAYSIZE(vertices);
+	;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 	bd.MiscFlags = 0;
@@ -287,7 +302,7 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 
 	if (FAILED(hr))
 	{
-		OutputDebugStringA("TEST");
+		OutputDebugStringA("vertexbuffer creation failure");
 	}
 
 	UINT stride = sizeof(SimpleVertex);
@@ -295,10 +310,69 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 
 	m_deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
+	WORD indices[] =
+	{
+		3,1,0,
+		2,1,3,
+
+		0,5,4,
+		1,5,0,
+
+		3,4,7,
+		0,4,3,
+
+		1,6,5,
+		2,6,1,
+
+		2,7,6,
+		3,7,2,
+
+		6,4,5,
+		7,4,6,
+	};
+
+	m_nrIndices = ARRAYSIZE(indices);
+
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.ByteWidth = sizeof(WORD) * m_nrIndices;
+	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	bd.CPUAccessFlags = 0;
+	initData.pSysMem = indices;
+	hr = m_device->CreateBuffer(&bd, &initData, &m_indexBuffer);
+
+	if (FAILED(hr))
+	{
+		OutputDebugStringA("IndexBuffer creation failure");
+	}
+
+	m_deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
+
 	// Set primitive topology
 	m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.ByteWidth = sizeof(ConstantBuffer);
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bd.CPUAccessFlags = 0;
+
+	hr = m_device->CreateBuffer(&bd, NULL, &m_constantBuffer);
+	if (FAILED(hr))
+	{
+		OutputDebugStringA("ConstantBuffer creation failure");
+	}
+
 	return hr;
+}
+
+void GraphicsEngine::updateConstantBuffers() const
+{
+	ConstantBuffer cb;
+
+	cb.mWorld = DirectX::XMMatrixTranspose(m_world);
+	cb.mView = DirectX::XMMatrixTranspose(m_view);
+	cb.mProjection = DirectX::XMMatrixTranspose(m_projection);
+
+	m_deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);	
 }
 
 void GraphicsEngine::setupMatrixes()
@@ -338,6 +412,8 @@ void GraphicsEngine::resetToNullptr()
 	m_backbuffer = nullptr;
 	m_rtw = nullptr;
 	m_vertexBuffer = nullptr;
+	m_indexBuffer = nullptr;
+	m_constantBuffer = nullptr;
 	m_VSBlob = nullptr;
 	m_PSBlob = nullptr;
 }

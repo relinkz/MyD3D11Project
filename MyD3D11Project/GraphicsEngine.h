@@ -28,6 +28,9 @@ protected:
 	ID3D11Texture2D*		m_backbuffer;
 	ID3D11RenderTargetView* m_rtw;
 	ID3D11Buffer*			m_vertexBuffer;
+	ID3D11Buffer*			m_indexBuffer;
+	ID3D11Buffer*			m_constantBuffer;
+
 
 	ID3D10Blob*				m_VSBlob;
 	ID3D10Blob*				m_PSBlob;
@@ -35,7 +38,7 @@ protected:
 	ID3D11VertexShader*		m_vertexshader;
 	ID3D11PixelShader*		m_pixelshader;
 
-	UINT					m_nrOfVertices;
+	UINT					m_nrIndices;
 
 	// matrixes
 	DirectX::XMMATRIX m_world;
@@ -54,6 +57,8 @@ protected:
 
 	// buffers
 	HRESULT createAndSetVertexBuffer();
+	void updateConstantBuffers() const;
+
 	void setupMatrixes();
 
 	void createTriangle();
