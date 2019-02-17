@@ -1,14 +1,10 @@
 #include "stdafx.h"
+#include "Entity.h"
 #include "GraphicsEngine.h"
-#include <D3D11.h>
-#include <DirectXMath.h>
 #include <D3DX11async.h>
 
-struct SimpleVertex
-{
-	DirectX::XMFLOAT3 pos;
-	DirectX::XMFLOAT4 color;
-};
+static const float W_WIDTH = 640.0f;
+static const float W_HEIGHT = 480.0f;
 
 struct ConstantBuffer
 {
@@ -104,7 +100,18 @@ void GraphicsEngine::Init(HWND & hWnd)
 
 	setupMatrixes();
 
-	createTriangle();
+	createVertexShader();
+
+	setInputLayout();
+
+	createAndSetVertexBuffer();
+
+	createPixelShader();
+
+	// triangles positions in the world;
+	m_entity[0] = Entity(0.0f, 1.0f, 0.0f);
+	m_entity[1] = Entity(1.0f, 0.0f, 0.0f);
+	m_entity[2] = Entity(-1.0f, 0.0f, 0.0f);
 }
 
 void GraphicsEngine::Render()
@@ -116,39 +123,8 @@ void GraphicsEngine::Render()
 	m_deviceContext->PSSetShader(m_pixelshader, NULL, 0);
 	m_deviceContext->VSSetConstantBuffers(0, 1, &m_constantBuffer);
 	
+	renderEntities();
 	
-	m_cube1 *= DirectX::XMMatrixTranslation(0.0f, -1.0f, 0.0f);
-	m_cube2 *= DirectX::XMMatrixTranslation(-1.0f, 0.0f, 0.0f);
-	m_cube3 *= DirectX::XMMatrixTranslation(1.0f, 0.0f, 0.0f);
-	
-	
-	ConstantBuffer cb;
-	cb.mView = DirectX::XMMatrixTranspose(m_view);
-	cb.mProjection = DirectX::XMMatrixTranspose(m_projection);
-
-	// 1
-	m_cube1 *= DirectX::XMMatrixRotationY(0.0005f);
-	m_cube1 *= DirectX::XMMatrixTranslation(0.0f, 1.0f, 0.0f);
-	cb.mWorld = DirectX::XMMatrixTranspose(m_cube1);
-	
-	m_deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);
-	m_deviceContext->DrawIndexed(m_nrIndices, 0, 0);
-
-	// 2
-	m_cube2 *= DirectX::XMMatrixRotationY(0.0005f);
-	m_cube2 *= DirectX::XMMatrixTranslation(1.0f, 0.0f, 0.0f);
-	cb.mWorld = DirectX::XMMatrixTranspose(m_cube2);
-	m_deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);
-	m_deviceContext->DrawIndexed(m_nrIndices, 0, 0);
-
-
-	m_cube3 *= DirectX::XMMatrixRotationY(0.0005f);
-	m_cube3 *= DirectX::XMMatrixTranslation(-1.0f, 0.0f, 0.0f);
-	cb.mWorld = DirectX::XMMatrixTranspose(m_cube3);
-	m_deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);
-	m_deviceContext->DrawIndexed(m_nrIndices, 0, 0);
-
-
 	m_sc->Present(0, 0);
 }
 
@@ -158,8 +134,8 @@ bool GraphicsEngine::createSwapChainDeviceAndContext(HWND &hWnd)
 	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
 
 	swapChainDesc.BufferCount = 1;
-	swapChainDesc.BufferDesc.Width = 640;
-	swapChainDesc.BufferDesc.Height = 480;
+	swapChainDesc.BufferDesc.Width = W_WIDTH;
+	swapChainDesc.BufferDesc.Height = W_HEIGHT;
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -213,8 +189,8 @@ bool GraphicsEngine::setupRenderTargetView()
 bool GraphicsEngine::setupViewport()
 {
 	D3D11_VIEWPORT vp;
-	vp.Width = static_cast<float>(640);
-	vp.Height = static_cast<float>(480);
+	vp.Width = W_WIDTH;
+	vp.Height = W_HEIGHT;
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0;
@@ -303,56 +279,21 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 {
 	HRESULT hr = S_OK;
 
-	SimpleVertex vertices[] =
-	{
-		// front
-		{ DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-	};
-	
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(SimpleVertex) * ARRAYSIZE(vertices);
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = 0;
-	bd.MiscFlags = 0;
-
-	D3D11_SUBRESOURCE_DATA initData;
-	ZeroMemory(&initData, sizeof(initData));
-	initData.pSysMem = vertices;
-
-	hr = m_device->CreateBuffer(&bd, &initData, &m_vertexBuffer);
+	VertexData test = Entity::getVertexDescription();
+	hr = m_device->CreateBuffer(&test.desc, &test.subdata, &m_vertexBuffer);
 
 	if (FAILED(hr))
 	{
 		OutputDebugStringA("vertexbuffer creation failure");
 	}
 
-	UINT stride = sizeof(SimpleVertex);
+	UINT stride = Entity::sizeOfVertex();
 	UINT offset = 0;
 
 	m_deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
-	WORD indices[] =
-	{
-		1,2,0,
-		1,0,3,
-
-		0,2,1,
-		3,0,1,
-	};
-
-	m_nrIndices = ARRAYSIZE(indices);
-
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(WORD) * m_nrIndices;
-	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	bd.CPUAccessFlags = 0;
-	initData.pSysMem = indices;
-	hr = m_device->CreateBuffer(&bd, &initData, &m_indexBuffer);
+	test = Entity::getIndexDescription();
+	hr = m_device->CreateBuffer(&test.desc, &test.subdata, &m_indexBuffer);
 
 	if (FAILED(hr))
 	{
@@ -363,6 +304,9 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 
 	// Set primitive topology
 	m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	D3D11_BUFFER_DESC bd;
+	ZeroMemory(&bd, sizeof(bd));
 
 	bd.Usage = D3D11_USAGE_DEFAULT;
 	bd.ByteWidth = sizeof(ConstantBuffer);
@@ -378,22 +322,24 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 	return hr;
 }
 
-void GraphicsEngine::updateConstantBuffers() const
+void GraphicsEngine::renderEntities()
 {
+	ConstantBuffer cb;
+	cb.mView = DirectX::XMMatrixTranspose(m_view);
+	cb.mProjection = DirectX::XMMatrixTranspose(m_projection);
 
+	for (int i = 0; i < ARRAYSIZE(m_entity); i++)
+	{
+		m_entity[i].update();
+		cb.mWorld = m_entity[i].getTransform();
+
+		m_deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);
+		m_deviceContext->DrawIndexed(Entity::indexCount, 0, 0);
+	}
 }
 
 void GraphicsEngine::setupMatrixes()
 {
-	// World matrix
-	m_cube1 = DirectX::XMMatrixIdentity();
-	m_cube2 = DirectX::XMMatrixIdentity();
-	m_cube3 = DirectX::XMMatrixIdentity();
-
-	m_cube1 = DirectX::XMMatrixTranslation(0.0f, 1.0f, 0.0f);
-	m_cube2 = DirectX::XMMatrixTranslation(1.0f, 0.0f, 0.0f);
-	m_cube3 = DirectX::XMMatrixTranslation(-1.0f, 0.0f, 0.0f);
-
 	// View Matrix
 	DirectX::XMVECTOR eye	= DirectX::XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
 	DirectX::XMVECTOR at	= DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -402,20 +348,9 @@ void GraphicsEngine::setupMatrixes()
 	m_view = DirectX::XMMatrixLookAtLH(eye, at, up);
 
 	// projectionMatrix
-	float aspectRatio = 640.0f / 480.0f;
+	float aspectRatio = W_WIDTH / W_HEIGHT;
 
 	m_projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, aspectRatio, 0.01f, 100.0f );
-}
-
-void GraphicsEngine::createTriangle()
-{
-	createVertexShader();
-
-	setInputLayout();
-
-	createAndSetVertexBuffer();
-
-	createPixelShader();
 }
 
 void GraphicsEngine::resetToNullptr()
