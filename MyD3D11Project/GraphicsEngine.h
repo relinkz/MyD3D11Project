@@ -40,8 +40,11 @@ protected:
 
 	UINT					m_nrIndices;
 
-	// matrixes
-	DirectX::XMMATRIX m_world;
+	// worldMatixes
+	DirectX::XMMATRIX m_cube1;
+	DirectX::XMMATRIX m_cube2;
+	DirectX::XMMATRIX m_cube3;
+
 	DirectX::XMMATRIX m_view;
 	DirectX::XMMATRIX m_projection;
 
