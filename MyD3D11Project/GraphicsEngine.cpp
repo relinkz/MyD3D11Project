@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Entity.h"
 #include "GraphicsEngine.h"
 #include <D3DX11async.h>
 
