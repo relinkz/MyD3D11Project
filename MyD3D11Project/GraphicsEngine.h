@@ -48,7 +48,6 @@ protected:
 	// helpers
 	void renderEntities();
 	void setupMatrixes();
-	void configureInputAssembler();
 
 	void resetToNullptr();
 };

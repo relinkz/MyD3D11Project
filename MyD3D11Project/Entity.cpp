@@ -8,31 +8,7 @@ SimpleVertex* Entity::vertices = nullptr;
 WORD* Entity::indices = nullptr;
 
 
-Entity::Entity() = default;
-
-Entity::Entity(float x, float y, float z) : m_pos(x, y, z)
-{
-	m_rotAngle = 0.0f;
-	m_scale = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
-}
-
-
-Entity::~Entity()
-{
-	if (Entity::vertices)
-	{
-		delete Entity::vertices;
-		Entity::vertices = nullptr;
-	}
-
-	if (Entity::indices)
-	{
-		delete Entity::indices;
-		Entity::indices = nullptr;
-	}
-}
-
-void Entity::createSimpleTriangle()
+Entity::Entity()
 {
 	if (!Entity::vertices)
 	{
@@ -63,6 +39,28 @@ void Entity::createSimpleTriangle()
 		Entity::indices[9] = 3;
 		Entity::indices[10] = 0;
 		Entity::indices[11] = 1;
+	}
+}
+
+Entity::Entity(float x, float y, float z) : m_pos(x, y, z)
+{
+	m_rotAngle = 0.0f;
+	m_scale = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
+}
+
+
+Entity::~Entity()
+{
+	if (Entity::vertices)
+	{
+		delete Entity::vertices;
+		Entity::vertices = nullptr;
+	}
+
+	if (Entity::indices)
+	{
+		delete Entity::indices;
+		Entity::indices = nullptr;
 	}
 }
 
