@@ -45,22 +45,10 @@ GraphicsEngine::~GraphicsEngine()
 		m_rtw = nullptr;
 	}
 
-	if (m_vertexBuffer)
-	{
-		m_vertexBuffer->Release();
-		m_vertexBuffer = nullptr;
-	}
-
-	if (m_indexBuffer)
-	{
-		m_indexBuffer->Release();
-		m_indexBuffer = nullptr;
-	}
-
 	if (m_constantBuffer)
 	{
 		m_constantBuffer->Release();
-		m_indexBuffer = nullptr;
+		m_constantBuffer = nullptr;
 	}
 
 	if (m_VSBlob)
@@ -102,6 +90,10 @@ void GraphicsEngine::Init(HWND & hWnd)
 
 	createVertexShader();
 
+	m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	createConstantBuffer();
+	
 	setInputLayout();
 
 	Entity::createSimpleTriangle();
@@ -113,8 +105,6 @@ void GraphicsEngine::Init(HWND & hWnd)
 	m_entity[2] = Entity(-1.0f, 0.0f, 0.0f);
 
 	createPixelShader();
-
-	// Entity::createSimpleTriangle();
 }
 
 void GraphicsEngine::Render()
@@ -282,6 +272,8 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 {
 	HRESULT hr = S_OK;
 
+	ID3D11Buffer*			m_vertexBuffer;
+
 	VertexData test = Entity::getVertexDescription();
 	hr = m_device->CreateBuffer(&test.desc, &test.subdata, &m_vertexBuffer);
 
@@ -295,6 +287,8 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 
 	m_deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
+	//index buffer
+	ID3D11Buffer*			m_indexBuffer;
 	test = Entity::getIndexDescription();
 	hr = m_device->CreateBuffer(&test.desc, &test.subdata, &m_indexBuffer);
 
@@ -305,8 +299,12 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 
 	m_deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
-	// Set primitive topology
-	m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	return hr;
+}
+
+HRESULT GraphicsEngine::createConstantBuffer()
+{
+	HRESULT hr = S_OK;
 
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
@@ -356,10 +354,6 @@ void GraphicsEngine::setupMatrixes()
 	m_projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, aspectRatio, 0.01f, 100.0f );
 }
 
-void GraphicsEngine::configureInputAssembler()
-{
-}
-
 void GraphicsEngine::resetToNullptr()
 {
 	m_sc = nullptr;
@@ -367,8 +361,6 @@ void GraphicsEngine::resetToNullptr()
 	m_deviceContext = nullptr;
 	m_backbuffer = nullptr;
 	m_rtw = nullptr;
-	m_vertexBuffer = nullptr;
-	m_indexBuffer = nullptr;
 	m_constantBuffer = nullptr;
 	m_VSBlob = nullptr;
 	m_PSBlob = nullptr;

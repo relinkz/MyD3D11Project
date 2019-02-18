@@ -16,8 +16,6 @@ protected:
 	ID3D11DeviceContext*	m_deviceContext;
 	ID3D11Texture2D*		m_backbuffer;
 	ID3D11RenderTargetView* m_rtw;
-	ID3D11Buffer*			m_vertexBuffer;
-	ID3D11Buffer*			m_indexBuffer;
 	ID3D11Buffer*			m_constantBuffer;
 
 	ID3D10Blob*				m_VSBlob;
@@ -26,7 +24,7 @@ protected:
 	ID3D11VertexShader*		m_vertexshader;
 	ID3D11PixelShader*		m_pixelshader;
 
-	// worldMatixes
+	// worldMatixes, temp solution
 	Entity m_entity[3];
 
 	DirectX::XMMATRIX m_view;
@@ -44,11 +42,11 @@ protected:
 
 	// buffers
 	HRESULT createAndSetVertexBuffer();
+	HRESULT createConstantBuffer();
 
 	// helpers
 	void renderEntities();
 	void setupMatrixes();
-	void configureInputAssembler();
 
 	void resetToNullptr();
 };

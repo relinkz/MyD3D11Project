@@ -22,13 +22,15 @@ protected:
 	DirectX::XMFLOAT3 m_pos;
 	DirectX::XMMATRIX m_scale;
 	float m_rotAngle;
-
+private:
 	static SimpleVertex* vertices;
 	static WORD* indices;
 public:
 	Entity();
 	Entity(float x, float y, float z);
 	virtual ~Entity();
+
+	static void createSimpleTriangle();
 
 	static VertexData getVertexDescription();
 	static VertexData getIndexDescription();
