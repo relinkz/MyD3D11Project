@@ -3,8 +3,8 @@
 #include "GraphicsEngine.h"
 #include <D3DX11async.h>
 
-static const float W_WIDTH = 640.0f;
-static const float W_HEIGHT = 480.0f;
+static const float W_WIDTH = 1920.0f;
+static const float W_HEIGHT = 1080.0f;
 
 struct ConstantBuffer
 {
@@ -104,14 +104,17 @@ void GraphicsEngine::Init(HWND & hWnd)
 
 	setInputLayout();
 
+	Entity::createSimpleTriangle();
+
 	createAndSetVertexBuffer();
 
-	createPixelShader();
-
-	// triangles positions in the world;
 	m_entity[0] = Entity(0.0f, 1.0f, 0.0f);
 	m_entity[1] = Entity(1.0f, 0.0f, 0.0f);
 	m_entity[2] = Entity(-1.0f, 0.0f, 0.0f);
+
+	createPixelShader();
+
+	// Entity::createSimpleTriangle();
 }
 
 void GraphicsEngine::Render()
@@ -351,6 +354,10 @@ void GraphicsEngine::setupMatrixes()
 	float aspectRatio = W_WIDTH / W_HEIGHT;
 
 	m_projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, aspectRatio, 0.01f, 100.0f );
+}
+
+void GraphicsEngine::configureInputAssembler()
+{
 }
 
 void GraphicsEngine::resetToNullptr()
