@@ -30,6 +30,8 @@ public:
 	Entity(float x, float y, float z);
 	virtual ~Entity();
 
+	static void createSimpleTriangle();
+
 	static VertexData getVertexDescription();
 	static VertexData getIndexDescription();
 	static UINT sizeOfVertex();
