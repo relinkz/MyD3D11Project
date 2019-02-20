@@ -36,19 +36,24 @@ void Entity::createSimpleTriangle()
 {
 	if (!Entity::vertices)
 	{
-		Entity::vertices = new SimpleVertex[4];
+		Entity::vertices = new SimpleVertex[8];
 		// front
-		Entity::vertices[0] = { DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) };
-		Entity::vertices[1] = { DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) };
-		Entity::vertices[2] = { DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) };
-		Entity::vertices[3] = { DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) };
+		Entity::vertices[0] = { DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) };
+		Entity::vertices[1] = { DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) };
+		Entity::vertices[2] = { DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) };
+		Entity::vertices[3] = { DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) };
+																											   							 
+		Entity::vertices[4] = { DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
+		Entity::vertices[5] = { DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
+		Entity::vertices[6] = { DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
+		Entity::vertices[7] = { DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
 	}
 
 	if (!Entity::indices)
 	{
 		Entity::indices = new WORD[Entity::indexCount];
 
-		Entity::indices[0] = 1;
+		Entity::indices[0] = 1;		//front
 		Entity::indices[1] = 2;
 		Entity::indices[2] = 0;
 
@@ -56,13 +61,13 @@ void Entity::createSimpleTriangle()
 		Entity::indices[4] = 0;
 		Entity::indices[5] = 3;
 
-		Entity::indices[6] = 0;
-		Entity::indices[7] = 2;
-		Entity::indices[8] = 1;
+		Entity::indices[6] = 4;		//back
+		Entity::indices[7] = 6;
+		Entity::indices[8] = 5;
 
-		Entity::indices[9] = 3;
-		Entity::indices[10] = 0;
-		Entity::indices[11] = 1;
+		Entity::indices[9]	= 7;
+		Entity::indices[10] = 4;
+		Entity::indices[11] = 5;
 	}
 }
 
@@ -71,7 +76,7 @@ VertexData Entity::getVertexDescription()
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(SimpleVertex) * 4;
+	bd.ByteWidth = sizeof(SimpleVertex) * 8;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 	bd.MiscFlags = 0;

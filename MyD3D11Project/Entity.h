@@ -14,6 +14,7 @@ struct SimpleVertex
 {
 	DirectX::XMFLOAT3 pos;
 	DirectX::XMFLOAT4 color;
+	DirectX::XMFLOAT3 norm;
 };
 
 class Entity
