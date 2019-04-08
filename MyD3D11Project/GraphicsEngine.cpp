@@ -326,8 +326,8 @@ HRESULT GraphicsEngine::createConstantBuffer()
 void GraphicsEngine::renderEntities()
 {
 	ConstantBuffer cb;
-	cb.mView = DirectX::XMMatrixTranspose(m_view);
-	cb.mProjection = DirectX::XMMatrixTranspose(m_projection);
+	cb.mView		= DirectX::XMMatrixTranspose(m_view);
+	cb.mProjection	= DirectX::XMMatrixTranspose(m_projection);
 
 	for (int i = 0; i < ARRAYSIZE(m_entity); i++)
 	{

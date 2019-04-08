@@ -37,23 +37,24 @@ void Entity::createSimpleTriangle()
 	if (!Entity::vertices)
 	{
 		Entity::vertices = new SimpleVertex[8];
-		// front
-		Entity::vertices[0] = { DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) };
-		Entity::vertices[1] = { DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) };
-		Entity::vertices[2] = { DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) };
-		Entity::vertices[3] = { DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) };
-																											   							 
-		Entity::vertices[4] = { DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
-		Entity::vertices[5] = { DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
-		Entity::vertices[6] = { DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
-		Entity::vertices[7] = { DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
+
+		// front Pos, Color, Normal
+		Entity::vertices[0] = { DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
+		Entity::vertices[1] = { DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
+		Entity::vertices[2] = { DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
+		Entity::vertices[3] = { DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f) };
+		
+		Entity::vertices[4] = { DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f) };
+		Entity::vertices[5] = { DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f) };
+		Entity::vertices[6] = { DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f) };
+		Entity::vertices[7] = { DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) , DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f) };
 	}
 
 	if (!Entity::indices)
 	{
 		Entity::indices = new WORD[Entity::indexCount];
 
-		Entity::indices[0] = 1;		//front
+		Entity::indices[0] = 1;
 		Entity::indices[1] = 2;
 		Entity::indices[2] = 0;
 
@@ -65,7 +66,7 @@ void Entity::createSimpleTriangle()
 		Entity::indices[7] = 6;
 		Entity::indices[8] = 5;
 
-		Entity::indices[9]	= 7;
+		Entity::indices[9] = 7;
 		Entity::indices[10] = 4;
 		Entity::indices[11] = 5;
 	}
@@ -120,13 +121,17 @@ UINT Entity::sizeOfVertex()
 
 void Entity::update()
 {
-	m_rotAngle += 0.0005f;
+	m_rotAngle += 0.0001f;
 }
 
 DirectX::XMMATRIX Entity::getTransform() const
 {
 	DirectX::XMMATRIX transform = m_scale;
+
 	transform *= DirectX::XMMatrixRotationY(m_rotAngle);
+	transform *= DirectX::XMMatrixRotationZ(m_rotAngle);
+	transform *= DirectX::XMMatrixRotationX(m_rotAngle);
+
 	transform *= DirectX::XMMatrixTranslation(m_pos.x, m_pos.y, m_pos.z);
 
 	return DirectX::XMMatrixTranspose(transform);
