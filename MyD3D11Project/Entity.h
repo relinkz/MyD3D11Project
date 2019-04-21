@@ -32,9 +32,11 @@ class Entity
 private:
 	std::vector<DirectX::XMFLOAT3> m_pos;
 	std::vector<DirectX::XMFLOAT3> m_norm;
+	
 	std::vector<std::string> m_faceDesc;
-
 	std::vector<Face> m_faces;
+
+	std::vector<std::string> m_mtlObjects;
 
 	std::map<const std::string, const DirectX::XMMATRIX> m_materials;
 

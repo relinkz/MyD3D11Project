@@ -62,7 +62,6 @@ std::string Entity::handleObjfile(const std::string& path)
 
 	std::string type = "";
 	std::string mltFile = "";
-	std::string mtlObj = "";
 
 	for (int i = 0; i < stringData_.size(); i++)
 	{
@@ -83,7 +82,7 @@ std::string Entity::handleObjfile(const std::string& path)
 		}
 		else if (type == "o")
 		{
-			mtlObj = stringData_[i];
+			m_mtlObjects.push_back(stringData_[i]);
 		}
 		else if (type[0] == '#' || type == "")
 		{
@@ -165,24 +164,44 @@ SimpleVertex Entity::stringToVertex(const std::string& str)
 	int normIndex = 0;
 	// v
 	auto index = str.find("v");
-	temp = str.substr(index + 1, str.find('/'));
+	if (index != std::string::npos)
+	{
+		temp = str.substr(index + 1, str.find('/'));
+	}
+	else
+	{
+		temp = str.substr(0, str.find('/'));
+	}
+
 	rest.erase(0, rest.find('/') + 1);
 
 	vIndex = std::stoi(temp);
 
 	// vt
 	index = rest.find("vt");
-	temp = rest.substr(index + 2, rest.find('/')-1);
+	if (index != std::string::npos)
+	{
+		temp = rest.substr(index + 2, rest.find('/') - 1);
+	}
+	else
+	{
+		temp = rest.substr(0, rest.find('/'));
+	}
 	rest.erase(0, rest.find('/') + 1);
 	
 	textIndex = std::stoi(temp);
+	std::string vertexColor = m_mtlObjects.at(textIndex - 1);
 
 	// vn
-	rest.erase(0 ,2);
+	index = str.find("vn");
+	if (index != std::string::npos)
+	{
+		rest.erase(0, 2);
+	}
 	normIndex = std::stoi(rest);
 
 	toReturn.pos = m_pos[vIndex - 1];
-	DirectX::XMStoreFloat4(&toReturn.color ,m_materials.find("red")->second.r[1]);
+	DirectX::XMStoreFloat4(&toReturn.color ,m_materials.find(vertexColor)->second.r[1]);
 	toReturn.norm = m_norm[normIndex - 1];
 
 	return toReturn;
@@ -245,7 +264,7 @@ bool Entity::readFromFile(const std::string& dir)
 
 Entity::Entity()
 {
-	readFromFile("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11Project/square.obj");
+	readFromFile("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11Project/cube.obj");
 }
 
 Entity::~Entity()

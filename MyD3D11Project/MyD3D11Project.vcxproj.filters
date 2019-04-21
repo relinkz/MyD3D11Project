@@ -73,9 +73,15 @@
     <None Include="square.mtl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="cube.mtl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="square.obj">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="cube.obj">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

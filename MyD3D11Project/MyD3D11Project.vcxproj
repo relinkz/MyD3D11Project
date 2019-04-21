@@ -203,11 +203,13 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="cube.obj" />
     <Text Include="square.obj">
       <SubType>Designer</SubType>
     </Text>
   </ItemGroup>
   <ItemGroup>
+    <None Include="cube.mtl" />
     <None Include="square.mtl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

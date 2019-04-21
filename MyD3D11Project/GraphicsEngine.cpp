@@ -333,9 +333,6 @@ void GraphicsEngine::renderEntities()
 
 	DirectX::XMFLOAT3 scale = DirectX::XMFLOAT3(1.0, 1.0, 1.0);
 	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0.0, m_orbitRot, 0.0);
-	//DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(m_orbitRot, 0.0, 0.0);
-	//DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0.0, 0.0, -m_orbitRot);
-	//DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(m_orbitRot, m_orbitRot, 0.0);
 
 	DirectX::XMFLOAT3 translate = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 
