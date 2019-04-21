@@ -329,16 +329,20 @@ void GraphicsEngine::renderEntities()
 	cb.mView		= DirectX::XMMatrixTranspose(m_view);
 	cb.mProjection	= DirectX::XMMatrixTranspose(m_projection);
 	
-	//m_orbitRot += 0.0005;
+	m_orbitRot += 0.0005;
 
 	DirectX::XMFLOAT3 scale = DirectX::XMFLOAT3(1.0, 1.0, 1.0);
 	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0.0, m_orbitRot, 0.0);
-	DirectX::XMFLOAT3 translate = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
+	//DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(m_orbitRot, 0.0, 0.0);
+	//DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0.0, 0.0, -m_orbitRot);
+	//DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(m_orbitRot, m_orbitRot, 0.0);
+
+	DirectX::XMFLOAT3 translate = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 
 	cb.mWorld = DirectX::XMMatrixTranspose(m_entity.getTransform(scale, rotation, translate));
 
 	m_deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);
-	m_deviceContext->Draw(m_entity.getNrOfVertex(), 0);
+	m_deviceContext->Draw(3 * m_entity.getNrOfVertex(), 0);
 
 	//m_deviceContext->DrawIndexed(Entity::indexCount, 0, 0);
 }

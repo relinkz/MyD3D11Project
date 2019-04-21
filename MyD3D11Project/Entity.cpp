@@ -231,14 +231,14 @@ bool Entity::parseFileDataToString(const std::string& dir)
 		handleObjfile(dir);
 	}
 
-	generateFaces();
-
 	return true;
 }
 
 bool Entity::readFromFile(const std::string& dir)
 {
 	parseFileDataToString(dir);
+
+	generateFaces();
 
 	return true;
 }
@@ -257,7 +257,7 @@ VertexData Entity::getVertexDescription()
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(Face);
+	bd.ByteWidth = sizeof(Face) * m_faces.size();
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 	bd.MiscFlags = 0;
@@ -280,7 +280,7 @@ UINT Entity::sizeOfVertex()
 
 UINT Entity::getNrOfVertex() const
 {
-	return m_faces.size() * sizeof(SimpleVertex);
+	return m_faces.size();
 }
 
 static DirectX::XMMATRIX applyRotation(const DirectX::XMFLOAT3& angle)
