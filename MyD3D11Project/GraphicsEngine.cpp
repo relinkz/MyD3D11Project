@@ -95,28 +95,24 @@ void GraphicsEngine::Init(HWND & hWnd)
 	
 	setInputLayout();
 
-	Entity::createSimpleTriangle();
-
 	createAndSetVertexBuffer();
 
-	m_entity[0] = Entity(0.0f, 1.0f, 0.0f);
-	m_entity[1] = Entity(1.0f, 0.0f, 0.0f);
-	m_entity[2] = Entity(-1.0f, 0.0f, 0.0f);
-
 	createPixelShader();
+
+	m_deviceContext->VSSetShader(m_vertexshader, NULL, 0);
+	m_deviceContext->PSSetShader(m_pixelshader, NULL, 0);
+
+	m_deviceContext->VSSetConstantBuffers(0, 1, &m_constantBuffer);
+	m_orbitRot = 0.0f;
 }
 
 void GraphicsEngine::Render()
 {
 	float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // RGBA
 	m_deviceContext->ClearRenderTargetView(m_rtw, clearColor);
-
-	m_deviceContext->VSSetShader(m_vertexshader, NULL, 0);
-	m_deviceContext->PSSetShader(m_pixelshader, NULL, 0);
-	m_deviceContext->VSSetConstantBuffers(0, 1, &m_constantBuffer);
 	
 	renderEntities();
-	
+
 	m_sc->Present(0, 0);
 }
 
@@ -126,8 +122,9 @@ bool GraphicsEngine::createSwapChainDeviceAndContext(HWND &hWnd)
 	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
 
 	swapChainDesc.BufferCount = 1;
-	swapChainDesc.BufferDesc.Width = W_WIDTH;
-	swapChainDesc.BufferDesc.Height = W_HEIGHT;
+	swapChainDesc.BufferDesc.Width = static_cast<UINT>(W_WIDTH);
+	swapChainDesc.BufferDesc.Height = static_cast<UINT>(W_HEIGHT);
+
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -274,7 +271,7 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 
 	ID3D11Buffer*			m_vertexBuffer;
 
-	VertexData test = Entity::getVertexDescription();
+	VertexData test = m_entity.getVertexDescription();
 	hr = m_device->CreateBuffer(&test.desc, &test.subdata, &m_vertexBuffer);
 
 	if (FAILED(hr))
@@ -287,9 +284,10 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 
 	m_deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
+	/*
 	//index buffer
 	ID3D11Buffer*			m_indexBuffer;
-	test = Entity::getIndexDescription();
+	test = m_entity.getIndexDescription();
 	hr = m_device->CreateBuffer(&test.desc, &test.subdata, &m_indexBuffer);
 
 	if (FAILED(hr))
@@ -299,6 +297,8 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 
 	m_deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
+
+	*/
 	return hr;
 }
 
@@ -328,15 +328,19 @@ void GraphicsEngine::renderEntities()
 	ConstantBuffer cb;
 	cb.mView		= DirectX::XMMatrixTranspose(m_view);
 	cb.mProjection	= DirectX::XMMatrixTranspose(m_projection);
+	
+	//m_orbitRot += 0.0005;
 
-	for (int i = 0; i < ARRAYSIZE(m_entity); i++)
-	{
-		m_entity[i].update();
-		cb.mWorld = m_entity[i].getTransform();
+	DirectX::XMFLOAT3 scale = DirectX::XMFLOAT3(1.0, 1.0, 1.0);
+	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0.0, m_orbitRot, 0.0);
+	DirectX::XMFLOAT3 translate = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
 
-		m_deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);
-		m_deviceContext->DrawIndexed(Entity::indexCount, 0, 0);
-	}
+	cb.mWorld = DirectX::XMMatrixTranspose(m_entity.getTransform(scale, rotation, translate));
+
+	m_deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);
+	m_deviceContext->Draw(m_entity.getNrOfVertex(), 0);
+
+	//m_deviceContext->DrawIndexed(Entity::indexCount, 0, 0);
 }
 
 void GraphicsEngine::setupMatrixes()

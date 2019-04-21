@@ -69,4 +69,14 @@
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="square.mtl">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="square.obj">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

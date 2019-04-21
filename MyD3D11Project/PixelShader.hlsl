@@ -14,8 +14,10 @@ float4 main(VS_OUTPUT input) : SV_Target
 
 	//return input.norm;
 	float4 toReturn = 0.0f;
+	//return input.color;
 	toReturn +=saturate( dot( (float3)vLightDir, input.norm) * vLightColor);
-	return toReturn + input.color;
+	//return toReturn;
+	//return toReturn + input.color;
 	return float4(abs(input.norm), 0.0f);
 	
 	//return toReturn;

@@ -25,8 +25,10 @@ protected:
 	ID3D11PixelShader*		m_pixelshader;
 
 	// worldMatixes, temp solution
-	Entity m_entity[3];
+	Entity m_entity;
 
+	float m_orbitRot;
+	
 	DirectX::XMMATRIX m_view;
 	DirectX::XMMATRIX m_projection;
 
