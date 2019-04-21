@@ -3,6 +3,8 @@ cbuffer ConstantBuffer : register(b0)
 	matrix world;
 	matrix view;
 	matrix projection;
+	float4 lightPos;
+	float4 lightColor;
 }
 
 struct VS_OUTPUT
@@ -10,6 +12,7 @@ struct VS_OUTPUT
 	float4 pos : SV_POSITION;
 	float4 color : COLOR0;
 	float3 norm : TEXCOORD0;
+	float4 posForLight : COLOR1;
 };
 
 VS_OUTPUT main(float4 Pos : POSITION, float4 Color : COLOR, float4 Norm : NORMAL)
@@ -22,12 +25,15 @@ VS_OUTPUT main(float4 Pos : POSITION, float4 Color : COLOR, float4 Norm : NORMAL
 
 	// Put the last to 0
 	Norm[3] = 0.0f;
-	//Norm = mul(Norm, world);
+	Norm = mul(Norm, world);
+	// why not view matrix?
 	//Norm = mul(Norm, view);
 	Norm = normalize(Norm);
 
 	output.norm = float3(Norm.x, Norm.y, Norm.z);
 	output.color = Color;
+
+	output.posForLight = mul(lightPos, view);
 
 	return output;
 }

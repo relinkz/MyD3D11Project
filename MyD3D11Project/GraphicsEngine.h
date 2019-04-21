@@ -15,6 +15,8 @@ protected:
 	ID3D11Device*			m_device;
 	ID3D11DeviceContext*	m_deviceContext;
 	ID3D11Texture2D*		m_backbuffer;
+	ID3D11Texture2D*		m_depthStencil;
+	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11RenderTargetView* m_rtw;
 	ID3D11Buffer*			m_constantBuffer;
 
@@ -26,6 +28,9 @@ protected:
 
 	// worldMatixes, temp solution
 	Entity m_entity;
+
+	//temp camera
+	DirectX::XMFLOAT3 m_cameraPos;
 
 	float m_orbitRot;
 	
@@ -45,6 +50,7 @@ protected:
 	// buffers
 	HRESULT createAndSetVertexBuffer();
 	HRESULT createConstantBuffer();
+	HRESULT createDepthBuffer();
 
 	// helpers
 	void renderEntities();

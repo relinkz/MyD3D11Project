@@ -53,7 +53,6 @@ public:
 	virtual ~Entity();
 
 	VertexData getVertexDescription();
-	VertexData getIndexDescription();
 	static UINT sizeOfVertex();
 	UINT getNrOfVertex() const;
 

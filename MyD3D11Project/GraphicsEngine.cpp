@@ -10,6 +10,8 @@ struct ConstantBuffer
 	DirectX::XMMATRIX mWorld;
 	DirectX::XMMATRIX mView;
 	DirectX::XMMATRIX mProjection;
+	DirectX::XMFLOAT4 mLightPos;
+	DirectX::XMFLOAT4 mLightColor;
 };
 
 GraphicsEngine::~GraphicsEngine()
@@ -85,6 +87,8 @@ void GraphicsEngine::Init(HWND & hWnd)
 
 	setupViewport();
 
+	m_cameraPos = DirectX::XMFLOAT3(0.0f, 1.0f, -2.0f);
+
 	setupMatrixes();
 
 	createVertexShader();
@@ -103,6 +107,7 @@ void GraphicsEngine::Init(HWND & hWnd)
 	m_deviceContext->PSSetShader(m_pixelshader, NULL, 0);
 
 	m_deviceContext->VSSetConstantBuffers(0, 1, &m_constantBuffer);
+	m_deviceContext->PSSetConstantBuffers(0, 1, &m_constantBuffer);
 	m_orbitRot = 0.0f;
 }
 
@@ -110,6 +115,8 @@ void GraphicsEngine::Render()
 {
 	float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // RGBA
 	m_deviceContext->ClearRenderTargetView(m_rtw, clearColor);
+	//m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 0, 0);
+
 	
 	renderEntities();
 
@@ -170,7 +177,7 @@ bool GraphicsEngine::setupRenderTargetView()
 	if (FAILED(res))
 		return false;
 
-	m_deviceContext->OMSetRenderTargets(1, &m_rtw, NULL);
+	m_deviceContext->OMSetRenderTargets(1, &m_rtw, m_depthStencilView);
 
 	return true;
 }
@@ -284,21 +291,6 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 
 	m_deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
-	/*
-	//index buffer
-	ID3D11Buffer*			m_indexBuffer;
-	test = m_entity.getIndexDescription();
-	hr = m_device->CreateBuffer(&test.desc, &test.subdata, &m_indexBuffer);
-
-	if (FAILED(hr))
-	{
-		OutputDebugStringA("IndexBuffer creation failure");
-	}
-
-	m_deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
-
-
-	*/
 	return hr;
 }
 
@@ -323,32 +315,71 @@ HRESULT GraphicsEngine::createConstantBuffer()
 	return hr;
 }
 
+HRESULT GraphicsEngine::createDepthBuffer()
+{
+	D3D11_TEXTURE2D_DESC descDepth;
+	ZeroMemory(&descDepth, sizeof(descDepth));
+
+	descDepth.Width = W_WIDTH;
+	descDepth.Height = W_HEIGHT;
+	descDepth.MipLevels = 1;
+	descDepth.ArraySize = 1;
+	descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	descDepth.SampleDesc.Count = 1;
+	descDepth.SampleDesc.Quality = 0;
+	descDepth.Usage = D3D11_USAGE_DEFAULT;
+	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	descDepth.CPUAccessFlags = 0;
+	descDepth.MiscFlags = 0;
+
+	auto hr = m_device->CreateTexture2D(&descDepth, NULL, &m_depthStencil);
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	// Create the depth stencil view
+	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+	ZeroMemory(&descDSV, sizeof(descDSV));
+	descDSV.Format = descDepth.Format;
+	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	descDSV.Texture2D.MipSlice = 0;
+	hr = m_device->CreateDepthStencilView(m_depthStencil, &descDSV, &m_depthStencilView);
+	if (FAILED(hr))
+		return hr;
+
+	return E_NOTIMPL;
+}
+
 void GraphicsEngine::renderEntities()
 {
 	ConstantBuffer cb;
-	cb.mView		= DirectX::XMMatrixTranspose(m_view);
-	cb.mProjection	= DirectX::XMMatrixTranspose(m_projection);
-	
 	m_orbitRot += 0.0005;
 
-	DirectX::XMFLOAT3 scale = DirectX::XMFLOAT3(1.0, 1.0, 1.0);
-	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0.0, m_orbitRot, 0.0);
+	cb.mView		= DirectX::XMMatrixTranspose(m_view);
+	cb.mProjection	= DirectX::XMMatrixTranspose(m_projection);
+	cb.mLightPos = DirectX::XMFLOAT4(0.0f, 7.0f, 0.0f, 0.0f);
+	cb.mLightColor = DirectX::XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 
-	DirectX::XMFLOAT3 translate = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	DirectX::XMFLOAT3 scale = DirectX::XMFLOAT3(1.0, 1.0, 1.0);
+	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0.0f, m_orbitRot, 0.0);
+	//DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(m_orbitRot, m_orbitRot, 0.0);
+
+
+	DirectX::XMFLOAT3 translate = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
 
 	cb.mWorld = DirectX::XMMatrixTranspose(m_entity.getTransform(scale, rotation, translate));
 
 	m_deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);
 	m_deviceContext->Draw(3 * m_entity.getNrOfVertex(), 0);
-
-	//m_deviceContext->DrawIndexed(Entity::indexCount, 0, 0);
 }
 
 void GraphicsEngine::setupMatrixes()
 {
 	// View Matrix
-	DirectX::XMVECTOR eye	= DirectX::XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
-	DirectX::XMVECTOR at	= DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	DirectX::XMVECTOR eye	= DirectX::XMVectorSet(m_cameraPos.x, m_cameraPos.y, m_cameraPos.z, 0.0f);
+	DirectX::XMVECTOR at	= DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	at = DirectX::XMVector4Normalize(DirectX::XMVectorSubtract(at,eye));
 	DirectX::XMVECTOR up	= DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
 	m_view = DirectX::XMMatrixLookAtLH(eye, at, up);
