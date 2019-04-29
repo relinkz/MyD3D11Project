@@ -87,7 +87,7 @@ void GraphicsEngine::Init(HWND & hWnd)
 
 	setupViewport();
 
-	m_cameraPos = DirectX::XMFLOAT3(0.0f, 1.0f, -2.0f);
+	m_cameraPos = DirectX::XMFLOAT3(5.0f, 5.0f, -3.0f);
 
 	setupMatrixes();
 
@@ -358,11 +358,17 @@ void GraphicsEngine::renderEntities()
 
 	cb.mView		= DirectX::XMMatrixTranspose(m_view);
 	cb.mProjection	= DirectX::XMMatrixTranspose(m_projection);
-	cb.mLightPos = DirectX::XMFLOAT4(0.0f, 7.0f, 0.0f, 0.0f);
+	cb.mLightPos = DirectX::XMFLOAT4(m_cameraPos.x, m_cameraPos.y, m_cameraPos.z, 0.0f);
 	cb.mLightColor = DirectX::XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 
+	float f45 = 3.14 / 4;
+	float f90 = 3.14 / 2;
+	float f180 = 3.14;
+
 	DirectX::XMFLOAT3 scale = DirectX::XMFLOAT3(1.0, 1.0, 1.0);
-	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0.0f, m_orbitRot, 0.0);
+	//DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(m_orbitRot, 0.0, 0.0);
+	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0, 0.0, 0);
+
 	//DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(m_orbitRot, m_orbitRot, 0.0);
 
 
