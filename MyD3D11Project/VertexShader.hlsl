@@ -26,14 +26,14 @@ VS_OUTPUT main(float4 Pos : POSITION, float4 Color : COLOR, float4 Norm : NORMAL
 	// Put the last to 0
 	Norm[3] = 0.0f;
 	Norm = mul(Norm, world);
-	// why not view matrix?
-	//Norm = mul(Norm, view);
+	Norm = mul(Norm, view);
 	Norm = normalize(Norm);
 
 	output.norm = float3(Norm.x, Norm.y, Norm.z);
 	output.color = Color;
 
-	output.posForLight = mul(lightPos, view);
+	output.posForLight = mul(lightPos, world);
+    output.posForLight = mul(lightPos, view);
 
 	return output;
 }
