@@ -17,8 +17,15 @@ struct VS_OUTPUT
 
 float3 main(VS_OUTPUT input) : SV_Target
 {
+    float4 ambientLight = float4(0.3, 0.0, 0.0, 0.0);
     float4 lightDir = normalize(input.posForLight); // posForLight pos is relative to pixel I assume?
     float angle		= dot(float4(input.norm, 0), lightDir);
 
-    return angle*input.color;
+    float4 light = ambientLight;
+    if(angle > 0.0f)
+    {
+        light = ambientLight + (angle * input.color);
+    }
+
+    return light;
 }

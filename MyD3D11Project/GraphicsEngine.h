@@ -2,6 +2,7 @@
 #define GRAPHICSENGINE_H
 
 #include "Entity.h"
+#include "Camera.h"
 
 class GraphicsEngine
 {
@@ -29,9 +30,7 @@ protected:
 	// worldMatixes, temp solution
 	Entity m_entity;
 
-	//temp camera
-	DirectX::XMFLOAT3 m_cameraPos;
-
+	Camera m_cam;
 	float m_orbitRot;
 	
 	DirectX::XMMATRIX m_view;

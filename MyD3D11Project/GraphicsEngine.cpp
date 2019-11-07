@@ -87,8 +87,6 @@ void GraphicsEngine::Init(HWND & hWnd)
 
 	setupViewport();
 
-	m_cameraPos = DirectX::XMFLOAT3(10.0f, 0.0f, 0.0f);
-
 	setupMatrixes();
 
 	createVertexShader();
@@ -102,6 +100,8 @@ void GraphicsEngine::Init(HWND & hWnd)
 	createAndSetVertexBuffer();
 
 	createPixelShader();
+
+	m_cam = Camera();
 
 	m_deviceContext->VSSetShader(m_vertexshader, NULL, 0);
 	m_deviceContext->PSSetShader(m_pixelshader, NULL, 0);
@@ -117,7 +117,6 @@ void GraphicsEngine::Render()
 	m_deviceContext->ClearRenderTargetView(m_rtw, clearColor);
 	//m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 0, 0);
 
-	
 	renderEntities();
 
 	m_sc->Present(0, 0);
@@ -356,14 +355,18 @@ void GraphicsEngine::renderEntities()
 	ConstantBuffer cb;
 	m_orbitRot += 0.0005;
 
+	auto yAxis = DirectX::XMFLOAT3(0, 1, 0);
+	m_cam.rotateCamera(yAxis, 0.0005);
+
 	// cameraPos at 10.0f, 0.0f, 0.0f;
-	cb.mView		= DirectX::XMMatrixTranspose(m_view);
+	cb.mView		= DirectX::XMMatrixTranspose(m_cam.getViewMatrix());
 	cb.mProjection	= DirectX::XMMatrixTranspose(m_projection);
 	cb.mLightPos	= DirectX::XMFLOAT4(3, 0, 0, 0.0f);
 	cb.mLightColor	= DirectX::XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	DirectX::XMFLOAT3 scale		= DirectX::XMFLOAT3(5.0, 5.0, 5.0);
-	DirectX::XMFLOAT3 rotation	= DirectX::XMFLOAT3(m_orbitRot, m_orbitRot, 0.0);
+	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0.0f, 0.0, 0.0);
+	//DirectX::XMFLOAT3 rotation	= DirectX::XMFLOAT3(m_orbitRot, m_orbitRot, 0.0);
 	DirectX::XMFLOAT3 translate = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 
 	cb.mWorld = DirectX::XMMatrixTranspose(m_entity.getTransform(scale, rotation, translate));
@@ -374,14 +377,6 @@ void GraphicsEngine::renderEntities()
 
 void GraphicsEngine::setupMatrixes()
 {
-	// View Matrix
-	DirectX::XMVECTOR eye	= DirectX::XMVectorSet(m_cameraPos.x, m_cameraPos.y, m_cameraPos.z, 0.0f);
-	DirectX::XMVECTOR at	= DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	at = DirectX::XMVector4Normalize(DirectX::XMVectorSubtract(at,eye));
-	DirectX::XMVECTOR up	= DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	m_view = DirectX::XMMatrixLookAtLH(eye, at, up);
-
 	// projectionMatrix
 	float aspectRatio = W_WIDTH / W_HEIGHT;
 
