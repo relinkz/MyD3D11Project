@@ -2,8 +2,8 @@
 #include "GraphicsEngine.h"
 #include <D3DX11async.h>
 
-static const float W_WIDTH = 1920.0f;
-static const float W_HEIGHT = 1080.0f;
+static const UINT W_WIDTH = 1920;
+static const UINT W_HEIGHT = 1080;
 
 struct ConstantBuffer
 {
@@ -353,10 +353,10 @@ HRESULT GraphicsEngine::createDepthBuffer()
 void GraphicsEngine::renderEntities()
 {
 	ConstantBuffer cb;
-	m_orbitRot += 0.0005;
+	m_orbitRot += 0.0005f;
 
 	auto yAxis = DirectX::XMFLOAT3(0, 1, 0);
-	m_cam.rotateCamera(yAxis, 0.0005);
+	m_cam.rotateCamera(yAxis, 0.0005f);
 
 	// cameraPos at 10.0f, 0.0f, 0.0f;
 	cb.mView		= DirectX::XMMatrixTranspose(m_cam.getViewMatrix());
@@ -378,7 +378,7 @@ void GraphicsEngine::renderEntities()
 void GraphicsEngine::setupMatrixes()
 {
 	// projectionMatrix
-	float aspectRatio = W_WIDTH / W_HEIGHT;
+	float aspectRatio = static_cast<float>(W_WIDTH) / static_cast<float>(W_HEIGHT);
 
 	m_projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, aspectRatio, 0.01f, 100.0f );
 }
