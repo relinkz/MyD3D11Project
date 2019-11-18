@@ -372,7 +372,7 @@ void GraphicsEngine::renderEntities()
 	cb.mWorld = DirectX::XMMatrixTranspose(m_entity.getTransform(scale, rotation, translate));
 
 	m_deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);
-	m_deviceContext->Draw(3 * m_entity.getNrOfVertex(), 0);
+	m_deviceContext->Draw(3 * m_entity.getNrOfFaces(), 0);
 }
 
 void GraphicsEngine::setupMatrixes()

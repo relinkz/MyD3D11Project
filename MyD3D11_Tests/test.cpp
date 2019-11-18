@@ -8,7 +8,7 @@ protected:
 
 	void SetUp() override
 	{
-		m_entity = Entity("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11Project/testObj.obj");
+		m_entity = Entity();
 	}
 };
 
@@ -25,4 +25,9 @@ TEST_F(Entity_readFromFile, normalEntries)
 TEST_F(Entity_readFromFile, faceEntries)
 {
 	EXPECT_EQ(m_entity.getNrOfFaces(), 12);
+}
+
+TEST_F(Entity_readFromFile, materialObjects)
+{
+	EXPECT_EQ(m_entity.getNrOfMtlObj(), 1);
 }

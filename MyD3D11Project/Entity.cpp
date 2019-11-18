@@ -39,108 +39,104 @@ static std::string stringPick(const std::string& line)
 	return substr;
 }
 
-std::string Entity::handleObjfile(const std::string& path)
+void Entity::handleObjfile(const std::string& path)
 {
 	std::ifstream modelfile(path.c_str());
 
+	// todo Exception?
 	if (!modelfile.is_open())
 	{
-		return false;
+		return;
 	}
 
-	std::vector<std::string>stringData_;
+	std::vector<std::string>stringData;
 	while (!modelfile.eof())
 	{
 		std::string data = "";
 		std::getline(modelfile, data);
 
-		stringData_.push_back(data);
+		stringData.push_back(data);
 	}
 
-	m_pos.reserve(stringData_.size());
-	m_norm.reserve(stringData_.size());
+	m_pos.reserve(stringData.size());
+	m_norm.reserve(stringData.size());
 
 	std::string type = "";
 	std::string mltFile = "";
 
-	for (size_t i = 0; i < stringData_.size(); i++)
+	for (size_t i = 0; i < stringData.size(); i++)
 	{
-		type = stringData_[i].substr(0, stringData_[i].find(" "));
-		stringData_[i].erase(0, stringData_[i].find(" ") + 1);
+		type = stringData[i].substr(0, stringData[i].find(" "));
+		stringData[i].erase(0, stringData[i].find(" ") + 1);
 
 		if (type == "f")
 		{
-			m_faceDesc.push_back(stringData_[i]);
+			m_faceDesc.push_back(stringData[i]);
 		}
 		else if(type == "v")
-			m_pos.push_back(stringVector(stringData_[i]));
+			m_pos.push_back(stringVector(stringData[i]));
 		else if(type == "vn")
-			m_norm.push_back(stringVector(stringData_[i]));
+			m_norm.push_back(stringVector(stringData[i]));
 		else if (type == "mtllib")
 		{
-			mltFile = stringData_[i];
+			mltFile = stringData[i];
 		}
 		else if (type == "o")
 		{
-			m_mtlObjects.push_back(stringData_[i]);
+			m_mtlObjects.push_back(stringData[i]);
 		}
-		else if (type[0] == '#' || type == "")
+		else if (type == "#" || type == "")
 		{
 			// comment
 		}
 	}
 
-	if (mltFile == "")
+	if (mltFile != "")
 	{
-		return "";
+		std::string mtlPath = path;
+		auto pos = mtlPath.find_last_of('/');
+		mtlPath = mtlPath.substr(0, pos + 1);
+
+		mtlPath += mltFile;
+
+		parseFileDataToString(mtlPath);
 	}
-
-	std::string mtlPath = path;
-	auto pos = mtlPath.find_last_of('/');
-	mtlPath = mtlPath.substr(0, pos + 1);
-
-	mtlPath += mltFile;
-
-	parseFileDataToString(mtlPath);
-
-
-	return mtlPath;
 }
 
-bool Entity::handleMtlfile(const std::string& path)
+void Entity::handleMtlfile(const std::string& path)
 {
 	std::ifstream modelfile(path.c_str());
 
+	//todo: exception?
 	if (!modelfile.is_open())
 	{
-		return false;
+		return;
 	}
 
-	std::vector<std::string>stringData_;
+	std::vector<std::string>stringData;
 	while (!modelfile.eof())
 	{
 		std::string data = "";
 		std::getline(modelfile, data);
 
-		stringData_.push_back(data);
+		stringData.push_back(data);
 	}
 
-	for (size_t i = 0; i < stringData_.size(); i++)
+	for (size_t i = 0; i < stringData.size(); i++)
 	{
-		std::string type = stringData_[i].substr(0, stringData_[i].find(" "));
-		stringData_[i].erase(0, stringData_[i].find(" ") + 1);
+		std::string type = stringData[i].substr(0, stringData[i].find(" "));
+		stringData[i].erase(0, stringData[i].find(" ") + 1);
 
 		if (type == "newmtl")
 		{
-			std::string key = stringData_[i];
+			std::string key = stringData[i];
 
-			auto v1 = stringVector(stringPick(stringData_[i + 1]));
-			auto v2 = stringVector(stringPick(stringData_[i + 2]));
-			auto v3 = stringVector(stringPick(stringData_[i + 3]));
+			auto v1 = stringVector(stringPick(stringData[i + 1]));
+			auto v2 = stringVector(stringPick(stringData[i + 2]));
+			auto v3 = stringVector(stringPick(stringData[i + 3]));
 
 			DirectX::XMMATRIX mat;
-
-			
+		
 			mat.r[0] = DirectX::XMVectorSet(v1.x, v1.y, v1.z, 1);
 			mat.r[1] = DirectX::XMVectorSet(v2.x, v2.y, v2.z, 1);
 			mat.r[2] = DirectX::XMVectorSet(v3.x, v3.y, v3.z, 1);
@@ -149,8 +145,6 @@ bool Entity::handleMtlfile(const std::string& path)
 			m_materials.insert({ key, mat });
 		}
 	}
-
-	return true;
 }
 
 SimpleVertex Entity::stringToVertex(const std::string& str)
@@ -267,14 +261,14 @@ Entity::Entity()
 
 Entity::Entity(const std::string & dir)
 {
-	readFromFile("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11Project/cube.obj");
+	readFromFile(dir);
 }
 
 Entity::~Entity()
 {
 }
 
-VertexData Entity::getVertexDescription()
+VertexData Entity::getVertexDescription() const
 {
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
@@ -298,11 +292,6 @@ VertexData Entity::getVertexDescription()
 UINT Entity::sizeOfVertex()
 {
 	return sizeof(SimpleVertex);
-}
-
-UINT Entity::getNrOfVertex() const
-{
-	return m_faces.size();
 }
 
 static DirectX::XMMATRIX applyRotation(const DirectX::XMFLOAT3& angle)
@@ -336,4 +325,9 @@ size_t Entity::getNrOfNormals() const
 size_t Entity::getNrOfFaces() const
 {
 	return m_faceDesc.size();
+}
+
+size_t Entity::getNrOfMtlObj() const
+{
+	return m_mtlObjects.size();
 }

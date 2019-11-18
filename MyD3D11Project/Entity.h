@@ -30,38 +30,34 @@ struct Face
 class Entity
 {
 private:
-	std::vector<DirectX::XMFLOAT3> m_pos;
-	std::vector<DirectX::XMFLOAT3> m_norm;
-	
-	std::vector<std::string> m_faceDesc;
-	std::vector<Face> m_faces;
-
-	std::vector<std::string> m_mtlObjects;
-
+	std::vector<DirectX::XMFLOAT3>	m_pos;
+	std::vector<DirectX::XMFLOAT3>	m_norm;
+	std::vector<std::string>		m_faceDesc;
+	std::vector<Face>				m_faces;
+	std::vector<std::string>		m_mtlObjects;
 	std::map<const std::string, const DirectX::XMMATRIX> m_materials;
 
 	bool readFromFile(const std::string& dir);
-	
-	std::string handleObjfile(const std::string& dir);
-	bool handleMtlfile(const std::string& path);
+	void handleObjfile(const std::string& dir);
+	void handleMtlfile(const std::string& path);
 	void generateFaces();
-	SimpleVertex stringToVertex(const std::string& str);
 
+	SimpleVertex stringToVertex(const std::string& str);
 	bool parseFileDataToString(const std::string& dir);
 public:
 	Entity();
 	Entity(const std::string& dir);
 	virtual ~Entity();
 
-	VertexData getVertexDescription();
-	static UINT sizeOfVertex();
-	UINT getNrOfVertex() const;
-
+	VertexData getVertexDescription() const;
 	DirectX::XMMATRIX getTransform(const DirectX::XMFLOAT3& scale, const DirectX::XMFLOAT3& angle, const DirectX::XMFLOAT3& translate) const;
 	
 	size_t getNrOfVertices()	const;
 	size_t getNrOfNormals()		const;
+	size_t getNrOfMtlObj()		const;
 	size_t getNrOfFaces()		const;
+
+	static UINT sizeOfVertex();
 };
 
 #endif // !ENTITY_H
