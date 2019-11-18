@@ -50,15 +50,18 @@ private:
 	bool parseFileDataToString(const std::string& dir);
 public:
 	Entity();
+	Entity(const std::string& dir);
 	virtual ~Entity();
 
 	VertexData getVertexDescription();
 	static UINT sizeOfVertex();
 	UINT getNrOfVertex() const;
 
-	static int indexCount;
-
 	DirectX::XMMATRIX getTransform(const DirectX::XMFLOAT3& scale, const DirectX::XMFLOAT3& angle, const DirectX::XMFLOAT3& translate) const;
+	
+	size_t getNrOfVertices()	const;
+	size_t getNrOfNormals()		const;
+	size_t getNrOfFaces()		const;
 };
 
 #endif // !ENTITY_H

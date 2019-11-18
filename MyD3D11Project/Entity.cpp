@@ -265,6 +265,11 @@ Entity::Entity()
 	readFromFile("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11Project/cube.obj");
 }
 
+Entity::Entity(const std::string & dir)
+{
+	readFromFile("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11Project/cube.obj");
+}
+
 Entity::~Entity()
 {
 }
@@ -316,4 +321,19 @@ DirectX::XMMATRIX Entity::getTransform(const DirectX::XMFLOAT3& scale, const Dir
 	DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslation(translate.x, translate.y, translate.z);
 
 	return (scaleMatrix * rotationMatrix * translationMatrix);
+}
+
+size_t Entity::getNrOfVertices() const
+{
+	return m_pos.size();
+}
+
+size_t Entity::getNrOfNormals() const
+{
+	return m_norm.size();
+}
+
+size_t Entity::getNrOfFaces() const
+{
+	return m_faceDesc.size();
 }
