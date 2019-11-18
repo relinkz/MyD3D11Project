@@ -63,7 +63,7 @@ std::string Entity::handleObjfile(const std::string& path)
 	std::string type = "";
 	std::string mltFile = "";
 
-	for (int i = 0; i < stringData_.size(); i++)
+	for (size_t i = 0; i < stringData_.size(); i++)
 	{
 		type = stringData_[i].substr(0, stringData_[i].find(" "));
 		stringData_[i].erase(0, stringData_[i].find(" ") + 1);
@@ -125,7 +125,7 @@ bool Entity::handleMtlfile(const std::string& path)
 		stringData_.push_back(data);
 	}
 
-	for (int i = 0; i < stringData_.size(); i++)
+	for (size_t i = 0; i < stringData_.size(); i++)
 	{
 		std::string type = stringData_[i].substr(0, stringData_[i].find(" "));
 		stringData_[i].erase(0, stringData_[i].find(" ") + 1);
@@ -209,8 +209,6 @@ SimpleVertex Entity::stringToVertex(const std::string& str)
 
 void Entity::generateFaces()
 {
-	auto it = m_faceDesc.begin();
-
 	for (auto it = m_faceDesc.begin(); it != m_faceDesc.end(); it++)
 	{
 
