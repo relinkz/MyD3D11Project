@@ -3,7 +3,7 @@
 
 using container = std::vector<std::string>;
 
-TEST(ObjParser_rawReadObj, test1) 
+TEST(ObjParser_storeFileAsString, test1)
 {
 	container e;
 
@@ -16,9 +16,7 @@ TEST(ObjParser_rawReadObj, test1)
 	e.emplace_back("");
 	e.emplace_back("vn 0.000000 0.000000 1.000000");
 
-	ObjParser parser = ObjParser("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11_Tests/test1.obj");
-
-	ASSERT_EQ(e, parser.getRawData());
+	ASSERT_EQ(e, storeFileAsString("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11_Tests/test1.obj"));
 }
 
 class ObjParser_fetchAllStringsOfType : public testing::Test
@@ -204,4 +202,24 @@ TEST_F(ObjParser_splitStringByCharacter, frontslash)
 	ASSERT_EQ(elements[0], vt0);
 	ASSERT_EQ(elements[1], vt1);
 	ASSERT_EQ(elements[2], vt2);
+}
+
+TEST(Constructor, file1)
+{
+	vector<array<float, 4>> expectedGeoVerts
+	{
+		{ -0.500000, -0.500000,	0.500000, 0.000000 },
+		{ 0.500000,	-0.500000, 0.500000, 0.000000 },
+		{ -0.500000, 0.500000, 0.500000, 0.000000 },
+		{ 0.500000, 0.500000, 0.500000, 0.000000 },
+
+		{ -0.500000, 0.500000, -0.500000 , 0.000000},
+		{ 0.500000, 0.500000, -0.500000 , 0.000000},
+		{ -0.500000, -0.500000, -0.500000 , 0.000000},
+		{ 0.500000, -0.500000, -0.500000 , 0.000000}
+	};
+
+	ObjParser obj = ObjParser("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11_Tests/testObj.obj");
+
+	ASSERT_EQ(obj.getGeometricVerticies(), expectedGeoVerts);
 }

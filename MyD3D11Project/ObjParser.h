@@ -7,7 +7,6 @@
 class ObjParser
 {
 private:
-	std::vector<std::string>			rawFileData_;
 	std::vector<std::array<float, 4>>	geometricVertices_;
 	std::vector<std::array<float, 3>>	vertexNormals_;
 	std::vector<std::array<float, 3>>	parameterSpaceVertices_;
@@ -17,6 +16,6 @@ public:
 	ObjParser() = default;
 	~ObjParser() = default;
 
-	std::vector<std::string> getRawData() const { return rawFileData_; }
+	std::vector<std::array<float, 4>> getGeometricVerticies() const { return geometricVertices_; }
 };
 

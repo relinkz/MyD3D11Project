@@ -54,11 +54,43 @@ static stringContainer splitStringByCharacter(const string& str, char c)
 	return toReturn;
 }
 
+static vector<array<float, 4>> populateGeoVertices(const stringContainer& geoVertList)
+{
+	vector<array<float, 4>> toReturn;
+	for (const string& row : geoVertList)
+	{
+		stringContainer split = splitStringByCharacter(row, ' ');
+		if (split.size() != 3 && split.size() != 4)
+		{
+			string err = __func__;
+			err.append(" ObjParser ERROR: geometric vertices not 3 or 4 by row");
+
+			throw(err);
+		}
+
+		array<float, 4> asFloat = { stof(split[0]), stof(split[1]), stof(split[2]), 0.0f };
+		if (split.size() == 4)
+		{
+			asFloat[3] = stof(split[3]);
+		}
+
+		toReturn.emplace_back(asFloat);
+	}
+
+	return toReturn;
+}
+
 ObjParser::ObjParser(const string& src)
 {
 	try
 	{
-		rawFileData_ = storeFileAsString(src);
+		const stringContainer rawFileData = storeFileAsString(src);
+
+		const stringContainer verts		= fetchAllStringsOfType("v ", rawFileData);
+		const stringContainer vTexts	= fetchAllStringsOfType("vt ", rawFileData);
+		const stringContainer vNorms	= fetchAllStringsOfType("vn ", rawFileData);
+
+		geometricVertices_ = populateGeoVertices(verts);
 	}
 	catch (const string msg)
 	{
