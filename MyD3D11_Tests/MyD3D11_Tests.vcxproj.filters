@@ -11,9 +11,6 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{e43c1a2f-5715-4772-8bff-0731b4069aff}</UniqueIdentifier>
     </Filter>
@@ -22,5 +19,8 @@
     <Object Include="testObj.obj">
       <Filter>Resource Files</Filter>
     </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

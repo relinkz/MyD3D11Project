@@ -146,3 +146,62 @@ TEST_F(ObjParser_fetchAllStringsOfType, neg_comments)
 
 	ASSERT_NE(expect, comm);
 }
+
+class ObjParser_splitStringByCharacter : public testing::Test
+{
+protected:
+	// ordinary vertexes, x y z (a)
+	string vertexType1_ = "-0.100000 -0.200000 -0.300000";
+	stringContainer expectedVertexType1_ = { "-0.100000", "-0.200000", "-0.300000" };
+
+	string vertexType2_ = "0.1 0.2 0.3";
+	stringContainer expectedVertexType2_ = { "0.1", "0.2","0.3" };
+
+	stringContainer expectedVertexType3_ = { "0.1", "0.2", "0.3", "0.4" };
+	string vertexType3_ = "0.1 0.2 0.3 0.4";
+
+	// face element, [geoVector index / texture index / normal index]
+	string polynomialType1_ = "1 2 3";
+	stringContainer expectedPolynomialType1_ = { "1", "2", "3" };
+	string polynomialType2_ = "3/1 4/2 5/3";
+	stringContainer expectedPolynomialType2_ = { "3/1", "4/2", "5/3" };
+
+	string polynomialType3_ = "6/4/1 3/5/3 7/6/5";
+	stringContainer expectedPolynomialType3_ = { "6/4/1", "3/5/3", "7/6/5" };
+
+	string polynomialType4_ = "7//1 8//2 9//3";
+	stringContainer expectedPolynomialType4_ = { "7//1", "8//2", "9//3" };
+
+	// line, vector indexes describing the line
+	string lineElement_ = "5 8 1 2 4 9";
+	stringContainer expectedLineElement_ = { "5", "8", "1", "2", "4", "9" };
+};
+
+TEST_F(ObjParser_splitStringByCharacter, whitespace)
+{
+	ASSERT_EQ(splitStringByCharacter(vertexType1_, ' '), expectedVertexType1_);
+	ASSERT_EQ(splitStringByCharacter(vertexType2_, ' '), expectedVertexType2_);
+	ASSERT_EQ(splitStringByCharacter(vertexType3_, ' '), expectedVertexType3_);
+
+	ASSERT_EQ(splitStringByCharacter(polynomialType1_, ' '), expectedPolynomialType1_);
+	ASSERT_EQ(splitStringByCharacter(polynomialType2_, ' '), expectedPolynomialType2_);
+	ASSERT_EQ(splitStringByCharacter(polynomialType3_, ' '), expectedPolynomialType3_);
+	ASSERT_EQ(splitStringByCharacter(polynomialType4_, ' '), expectedPolynomialType4_);
+
+	ASSERT_EQ(splitStringByCharacter(lineElement_, ' '), expectedLineElement_);
+}
+
+TEST_F(ObjParser_splitStringByCharacter, frontslash)
+{
+	vector<stringContainer> elements;
+	for (const string& element : expectedPolynomialType2_)
+		elements.emplace_back(splitStringByCharacter(element, '/'));
+
+	stringContainer vt0 = { "3", "1" };
+	stringContainer vt1 = { "4", "2" };
+	stringContainer vt2 = { "5", "3" };
+
+	ASSERT_EQ(elements[0], vt0);
+	ASSERT_EQ(elements[1], vt1);
+	ASSERT_EQ(elements[2], vt2);
+}

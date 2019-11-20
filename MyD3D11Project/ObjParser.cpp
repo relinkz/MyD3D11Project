@@ -2,32 +2,36 @@
 #include "ObjParser.h"
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
-static std::vector<std::string> storeFileAsString(const std::string& src)
+using namespace std;
+using stringContainer = vector<string>;
+
+static stringContainer storeFileAsString(const string& src)
 {
-	std::ifstream modelfile(src.c_str());
-	std::vector<std::string> toReturn;
+	ifstream modelfile(src.c_str());
+	stringContainer toReturn;
 
 	if (!modelfile.is_open())
 	{
 		throw("Error: Fail to open file: " + src);
 	}
 
-	std::string line = "";
-	while (std::getline(modelfile, line))
+	string line = "";
+	while (getline(modelfile, line))
 	{
 		toReturn.emplace_back(line);
 	}
 	return toReturn;
 }
 
-static std::vector<std::string> fetchAllStringsOfType(const std::string& type, const std::vector<std::string>& data)
+static stringContainer fetchAllStringsOfType(const string& type, const stringContainer& data)
 {
-	std::vector<std::string> toReturn;
+	stringContainer toReturn;
 
-	for (const std::string& row : data)
+	for (const string& row : data)
 	{
-		if (row.find(type) != std::string::npos)
+		if (row.find(type) != string::npos)
 		{
 			toReturn.emplace_back(row.substr(type.size(), row.size()));
 		}
@@ -36,14 +40,28 @@ static std::vector<std::string> fetchAllStringsOfType(const std::string& type, c
 	return toReturn;
 }
 
-ObjParser::ObjParser(const std::string& src)
+static stringContainer splitStringByCharacter(const string& str, char c)
+{
+	stringContainer toReturn;
+	string s;
+
+	istringstream stream(str);
+	while (getline(stream, s, c))
+	{
+		toReturn.emplace_back(s);
+	}
+
+	return toReturn;
+}
+
+ObjParser::ObjParser(const string& src)
 {
 	try
 	{
 		rawFileData_ = storeFileAsString(src);
 	}
-	catch (const std::string msg)
+	catch (const string msg)
 	{
-		std::cout << msg << std::endl;
+		cout << msg << endl;
 	}
 }
