@@ -3,9 +3,6 @@
   <ItemGroup>
     <ClCompile Include="test.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="ObjParser_suite.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

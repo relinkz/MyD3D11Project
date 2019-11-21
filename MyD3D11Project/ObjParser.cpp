@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ObjParser.h"
+#include <assert.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -54,7 +55,7 @@ static stringContainer splitStringByCharacter(const string& str, char c)
 	return toReturn;
 }
 
-static vector<array<float, 4>> populateGeoVertices(const stringContainer& geoVertList)
+static vector<array<float, 4>> toFloat4Vector(const stringContainer& geoVertList)
 {
 	vector<array<float, 4>> toReturn;
 	for (const string& row : geoVertList)
@@ -80,6 +81,50 @@ static vector<array<float, 4>> populateGeoVertices(const stringContainer& geoVer
 	return toReturn;
 }
 
+static vector<array<float, 3>> toFloat3Vector(const stringContainer& vertexNormalsList)
+{
+	vector<array<float, 3>> toReturn;
+
+	for (const string& row : vertexNormalsList)
+	{
+		stringContainer split = splitStringByCharacter(row, ' ');
+		if (split.size() != 3)
+		{
+			string err = __func__;
+			err.append(" ObjParser ERROR: toFloat3Vector");
+
+			throw(err);
+		}
+
+		array<float, 3> asFloat = { stof(split[0]), stof(split[1]), stof(split[2]) };
+		toReturn.emplace_back(asFloat);
+	}
+
+	return toReturn;
+}
+
+static vector<array<float, 2>> toFloat2Vector(const stringContainer& vertexNormalsList)
+{
+	vector<array<float, 2>> toReturn;
+
+	for (const string& row : vertexNormalsList)
+	{
+		stringContainer split = splitStringByCharacter(row, ' ');
+		if (split.size() != 2)
+		{
+			string err = __func__;
+			err.append(" ObjParser ERROR: toFloat2Vector");
+
+			throw(err);
+		}
+
+		array<float, 2> asFloat = { stof(split[0]), stof(split[1]) };
+		toReturn.emplace_back(asFloat);
+	}
+
+	return toReturn;
+}
+
 ObjParser::ObjParser(const string& src)
 {
 	try
@@ -90,10 +135,13 @@ ObjParser::ObjParser(const string& src)
 		const stringContainer vTexts	= fetchAllStringsOfType("vt ", rawFileData);
 		const stringContainer vNorms	= fetchAllStringsOfType("vn ", rawFileData);
 
-		geometricVertices_ = populateGeoVertices(verts);
+		geometricVertices_				= toFloat4Vector(verts);
+		textureCoordinates_				= toFloat2Vector(vTexts);
+		vertexNormals_					= toFloat3Vector(vNorms);
 	}
 	catch (const string msg)
 	{
 		cout << msg << endl;
+		assert(false);
 	}
 }

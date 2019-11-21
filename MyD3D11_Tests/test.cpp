@@ -1,33 +1,59 @@
 #include "pch.h"
-#include "../MyD3D11Project/Entity.cpp"
+#include "../MyD3D11Project/ObjParser.h"
+#include "../MyD3D11Project/ObjParser.cpp"
+//TODO: linker are searching for the cpp file inside testproject.
 
-class Entity_readFromFile : public testing::Test 
+using namespace std;
+
+TEST(ObjParser, GeoVerts)
 {
-protected:
-	Entity m_entity;
+	ObjParser test("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11_Tests/testObj.obj");
 
-	void SetUp() override
+	vector<array<float, 4>> expectedGeoVerts
 	{
-		m_entity = Entity();
-	}
-};
+		{ -0.500000, -0.500000,	0.500000, 0.000000 },
+		{ 0.500000,	-0.500000, 0.500000, 0.000000 },
+		{ -0.500000, 0.500000, 0.500000, 0.000000 },
+		{ 0.500000, 0.500000, 0.500000, 0.000000 },
 
-TEST_F(Entity_readFromFile, positionEntries) 
-{
-	EXPECT_EQ(m_entity.getNrOfVertices(), 8);
+		{ -0.500000, 0.500000, -0.500000 , 0.000000},
+		{ 0.500000, 0.500000, -0.500000 , 0.000000},
+		{ -0.500000, -0.500000, -0.500000 , 0.000000},
+		{ 0.500000, -0.500000, -0.500000 , 0.000000}
+	};
+
+	ASSERT_EQ(expectedGeoVerts, test.getGeometricVerticies());
 }
 
-TEST_F(Entity_readFromFile, normalEntries)
+TEST(ObjParser, vertexNormals)
 {
-	EXPECT_EQ(m_entity.getNrOfNormals(), 6);
+	ObjParser test("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11_Tests/testObj.obj");
+
+	vector<array<float, 3>> expectedVertexNormals
+	{
+		{ 0.000000, 0.000000, 1.000000 },
+		{ 0.000000, 1.000000, 0.000000 },
+		{ 0.000000, 0.000000, -1.000000 },
+
+		{ 0.000000, -1.000000, 0.000000 },
+		{ 1.000000, 0.000000, 0.000000 },
+		{ -1.000000, 0.000000, 0.000000 }
+	};
+
+	ASSERT_EQ(expectedVertexNormals, test.getVertexNormals());
 }
 
-TEST_F(Entity_readFromFile, faceEntries)
+TEST(ObjParser, textureCoordinates)
 {
-	EXPECT_EQ(m_entity.getNrOfFaces(), 12);
-}
+	ObjParser test("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11_Tests/testObj.obj");
 
-TEST_F(Entity_readFromFile, materialObjects)
-{
-	EXPECT_EQ(m_entity.getNrOfMtlObj(), 1);
+	vector<array<float, 2>> expected
+	{
+		{ 0.000000, 0.000000 },
+		{ 1.000000, 0.000000 },
+		{ 0.000000, 1.000000 },
+		{ 1.000000, 1.000000 }
+	};
+
+	ASSERT_EQ(expected, test.getTextureCoordinates());
 }
