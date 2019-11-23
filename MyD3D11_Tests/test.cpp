@@ -76,3 +76,59 @@ TEST(ObjParser, parameterSpaceVertices)
 
 	ASSERT_EQ(expected, test.getParameterSpaceVertices());
 }
+
+TEST(ObjParser, generateFacesSampleFirst)
+{
+	ObjParser test("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11_Tests/testObj.obj");
+
+	// f 1/1/1 2/1/1 3/1/1
+	FaceElement expected;
+	expected.v_ = { -0.500000, -0.500000,	0.500000,  1.000000 };
+	expected.vt_ = { 0.000000, 0.000000, 0.000000, 0.0 };
+	expected.vn_ = { 0.000000, 0.000000, 1.000000, 0.0 };
+
+	std::vector<FaceElement> faceElem = test.getFaceElements();
+
+	ASSERT_EQ(expected.v_.x, faceElem.at(0).v_.x);
+	ASSERT_EQ(expected.v_.y, faceElem.at(0).v_.y);
+	ASSERT_EQ(expected.v_.z, faceElem.at(0).v_.z);
+	ASSERT_EQ(expected.v_.w, faceElem.at(0).v_.w);
+
+	ASSERT_EQ(expected.vt_.x, faceElem.at(0).vt_.x);
+	ASSERT_EQ(expected.vt_.y, faceElem.at(0).vt_.y);
+	ASSERT_EQ(expected.vt_.z, faceElem.at(0).vt_.z);
+	ASSERT_EQ(expected.vt_.w, faceElem.at(0).vt_.w);
+
+	ASSERT_EQ(expected.vn_.x, faceElem.at(0).vn_.x);
+	ASSERT_EQ(expected.vn_.y, faceElem.at(0).vn_.y);
+	ASSERT_EQ(expected.vn_.z, faceElem.at(0).vn_.z);
+	ASSERT_EQ(expected.vn_.w, faceElem.at(0).vn_.w);
+}
+
+TEST(ObjParser, generateFacesSampleLast)
+{
+	ObjParser test("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11_Tests/testObj.obj");
+
+	// f 3/1/6
+	FaceElement expected;
+	expected.v_ = { -0.500000, 0.500000, 0.500000,  1.000000 };
+	expected.vt_ = { 0.000000, 0.000000, 0.000000, 0.0 };
+	expected.vn_ = { -1.000000, 0.000000, 0.000000, 0.0 };
+
+	std::vector<FaceElement> faceElem = test.getFaceElements();
+
+	ASSERT_EQ(expected.v_.x, faceElem.back().v_.x);
+	ASSERT_EQ(expected.v_.y, faceElem.back().v_.y);
+	ASSERT_EQ(expected.v_.z, faceElem.back().v_.z);
+	ASSERT_EQ(expected.v_.w, faceElem.back().v_.w);
+
+	ASSERT_EQ(expected.vt_.x, faceElem.back().vt_.x);
+	ASSERT_EQ(expected.vt_.y, faceElem.back().vt_.y);
+	ASSERT_EQ(expected.vt_.z, faceElem.back().vt_.z);
+	ASSERT_EQ(expected.vt_.w, faceElem.back().vt_.w);
+
+	ASSERT_EQ(expected.vn_.x, faceElem.back().vn_.x);
+	ASSERT_EQ(expected.vn_.y, faceElem.back().vn_.y);
+	ASSERT_EQ(expected.vn_.z, faceElem.back().vn_.z);
+	ASSERT_EQ(expected.vn_.w, faceElem.back().vn_.w);
+}

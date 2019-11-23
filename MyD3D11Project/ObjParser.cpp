@@ -93,21 +93,58 @@ static vector<array<float, 3>> toFloat3Vector(const stringContainer& stringList,
 	return toReturn;
 }
 
+FaceElement ObjParser::getFaceVertex(const std::string& desc) const
+{
+	FaceElement element;
+
+	element.v_	= DirectX::XMFLOAT4(0, 0, 0, 0);
+	element.vt_ = DirectX::XMFLOAT4(0, 0, 0, 0);
+	element.vn_ = DirectX::XMFLOAT4(0, 0, 0, 0);
+
+	stringContainer indexes = splitStringByCharacter(desc, '/');
+	
+	// obj is starting from 1, so I need to offset that
+	size_t v =	stoi(indexes[0]) - 1;
+	size_t vt = stoi(indexes[1]) - 1;
+	size_t vn = stoi(indexes[2]) - 1;
+
+	element.v_	= DirectX::XMFLOAT4(geometricVertices_[v][0], geometricVertices_[v][1], geometricVertices_[v][2], geometricVertices_[v][3]);
+	element.vt_ = DirectX::XMFLOAT4(textureCoordinates_[vt][0], textureCoordinates_[vt][1], textureCoordinates_[vt][2], 0.0f);
+	element.vn_ = DirectX::XMFLOAT4(vertexNormals_[vn][0], vertexNormals_[vn][1], vertexNormals_[vn][2], 0.0f);
+
+	return element;
+}
+
+void ObjParser::generateFaceElements(const stringContainer& faceList)
+{
+	for (const string& face : faceList)
+	{
+		stringContainer faceElem = splitStringByCharacter(face, ' ');
+		for (const string& item : faceElem)
+			faceElements_.emplace_back(getFaceVertex(item));
+	}
+}
+
 ObjParser::ObjParser(const string& src)
 {
 	try
 	{
 		const stringContainer rawFileData = storeFileAsString(src);
 
-		const stringContainer v		= fetchAllStringsOfType("v ", rawFileData);
-		const stringContainer vt	= fetchAllStringsOfType("vt ", rawFileData);
-		const stringContainer vn	= fetchAllStringsOfType("vn ", rawFileData);
-		const stringContainer vp	= fetchAllStringsOfType("vp ", rawFileData);
-
+		const stringContainer v		= fetchAllStringsOfType("v ",	rawFileData);
 		geometricVertices_			= toFloat4Vector(v, 1.0f);
+		
+		const stringContainer vt	= fetchAllStringsOfType("vt ",	rawFileData);
 		textureCoordinates_			= toFloat3Vector(vt);
+		
+		const stringContainer vn	= fetchAllStringsOfType("vn ",	rawFileData);
 		vertexNormals_				= toFloat3Vector(vn);
+		
+		const stringContainer vp	= fetchAllStringsOfType("vp ",	rawFileData);
 		parameterSpaceVertices_		= toFloat3Vector(vp);
+		
+		const stringContainer f		= fetchAllStringsOfType("f ",	rawFileData);
+		generateFaceElements(f);
 	}
 	catch (const string msg)
 	{

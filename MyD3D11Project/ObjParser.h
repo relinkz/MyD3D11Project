@@ -1,8 +1,16 @@
 #pragma once
 
+#include <DirectXMath.h>
 #include <string>
 #include <vector>
 #include <array>
+
+struct FaceElement
+{
+	DirectX::XMFLOAT4 v_;
+	DirectX::XMFLOAT4 vt_;
+	DirectX::XMFLOAT4 vn_;
+};
 
 class ObjParser
 {
@@ -11,6 +19,10 @@ private:
 	std::vector<std::array<float, 3>>	vertexNormals_;
 	std::vector<std::array<float, 3>>	textureCoordinates_;
 	std::vector<std::array<float, 3>>	parameterSpaceVertices_;
+
+	std::vector<FaceElement>			faceElements_;
+	void								generateFaceElements(const std::vector<std::string>& faceList);
+
 public:
 	ObjParser(const std::string& src);
 	ObjParser() = default;
@@ -24,5 +36,9 @@ public:
 	std::vector<std::array<float, 3>> getTextureCoordinates()		const { return textureCoordinates_; }
 	// Parameter space vertices in ( u [,v] [,w] ) form; free form geometry statement
 	std::vector<std::array<float, 3>> getParameterSpaceVertices()	const { return parameterSpaceVertices_; }
+
+	// get faceVertex described by string, "vIndex/vtIndex/vnIndex/" example: "1/1/1"
+	FaceElement getFaceVertex(const std::string& desc) const;
+	std::vector<FaceElement> getFaceElements() const { return faceElements_; };
 };
 
