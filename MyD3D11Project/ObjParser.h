@@ -23,6 +23,14 @@ private:
 	std::vector<FaceElement>			faceElements_;
 	void								generateFaceElements(const std::vector<std::string>& faceList);
 
+	// material definitions
+	std::vector<std::string>			mtlFiles_;
+	std::vector<std::string>			mtlNames_;
+
+	// grouping, unused by this application until I find some use for it
+	std::vector<std::string>			mtlGroupNames_;
+	std::vector<std::string>			mtlSmoothShading_;
+
 public:
 	ObjParser(const std::string& src);
 	ObjParser() = default;
@@ -39,6 +47,12 @@ public:
 
 	// get faceVertex described by string, "vIndex/vtIndex/vnIndex/" example: "1/1/1"
 	FaceElement getFaceVertex(const std::string& desc) const;
-	std::vector<FaceElement> getFaceElements() const { return faceElements_; };
+	
+	std::vector<FaceElement> getFaceElements()		const { return faceElements_; }
+	std::vector<std::string> getMtlFiles()			const { return mtlFiles_; }
+	std::vector<std::string> getMtlNames()			const { return mtlNames_; }
+	std::vector<std::string> getMtlGroupNames()		const { return mtlGroupNames_; }
+	std::vector<std::string> getMtlSmoothShading()	const { return mtlSmoothShading_; }
+
 };
 

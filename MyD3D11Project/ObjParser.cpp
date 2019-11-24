@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <chrono>
 
 using namespace std;
 using stringContainer = vector<string>;
@@ -32,7 +33,7 @@ static stringContainer fetchAllStringsOfType(const string& type, const stringCon
 
 	for (const string& row : data)
 	{
-		if (row.find(type) != string::npos)
+		if ( row[0] != '#' && row.find(type) != string::npos)
 		{
 			toReturn.emplace_back(row.substr(type.size(), row.size()));
 		}
@@ -127,6 +128,8 @@ void ObjParser::generateFaceElements(const stringContainer& faceList)
 
 ObjParser::ObjParser(const string& src)
 {
+	using namespace chrono;
+
 	try
 	{
 		const stringContainer rawFileData = storeFileAsString(src);
@@ -145,6 +148,11 @@ ObjParser::ObjParser(const string& src)
 		
 		const stringContainer f		= fetchAllStringsOfType("f ",	rawFileData);
 		generateFaceElements(f);
+
+		mtlFiles_					= fetchAllStringsOfType("mtllib ", rawFileData);
+		mtlNames_					= fetchAllStringsOfType("usemtl ", rawFileData);
+		mtlGroupNames_				= fetchAllStringsOfType("g ", rawFileData);
+		mtlSmoothShading_			= fetchAllStringsOfType("s ", rawFileData);
 	}
 	catch (const string msg)
 	{

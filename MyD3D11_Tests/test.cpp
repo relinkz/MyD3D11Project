@@ -132,3 +132,18 @@ TEST(ObjParser, generateFacesSampleLast)
 	ASSERT_EQ(expected.vn_.z, faceElem.back().vn_.z);
 	ASSERT_EQ(expected.vn_.w, faceElem.back().vn_.w);
 }
+
+TEST(ObjParser, mtlTest)
+{
+	ObjParser test("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11_Tests/crate1.obj");
+
+	stringContainer expectedMtlFiles			= { "crate1.mtl" };
+	stringContainer expectedMtlGroupNames		= { "default", "crate1" };
+	stringContainer expectedMtlNames			= { "M_crate1_blinn" };
+	stringContainer expectedMtlSmoothShadings	= { "off" };
+
+	ASSERT_EQ(expectedMtlFiles,				test.getMtlFiles());
+	ASSERT_EQ(expectedMtlGroupNames,		test.getMtlGroupNames());
+	ASSERT_EQ(expectedMtlNames,				test.getMtlNames());
+	ASSERT_EQ(expectedMtlSmoothShadings,	test.getMtlSmoothShading());
+}
