@@ -57,7 +57,7 @@ private:
 	std::vector<std::string>			mtlNames_;
 
 	std::vector<Material>				materials_;
-	void ObjParser::readMtlLibrary(const string& libPath);
+	void readMtlLibrary1(const std::string& libPath) const;
 
 	// grouping, unused by this application until I find some use for it
 	std::vector<std::string>			mtlGroupNames_;

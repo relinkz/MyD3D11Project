@@ -126,7 +126,7 @@ void ObjParser::generateFaceElements(const stringContainer& faceList)
 	}
 }
 
-void ObjParser::readMtlLibrary(const string& libPath)
+void ObjParser::readMtlLibrary1(const string& libPath) const
 {
 	stringContainer rawFileDataMtl;
 
