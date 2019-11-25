@@ -12,6 +12,35 @@ struct FaceElement
 	DirectX::XMFLOAT4 vn_;
 };
 
+enum IlluminationModel
+{
+	colorOnAmbientOff,
+	colorOnAmbientOn,
+	highlightOn,
+	unknown
+};
+
+struct Material
+{
+	Material() = default;
+	std::string			materialName_		= "";
+	DirectX::XMFLOAT3	ambientColor_		= { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3	diffuseColor_		= { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3	specularColor_		= { 0.0f, 0.0f, 0.0f };
+	uint16_t			specularExponent_	= 0;
+	IlluminationModel	illuminationModel_	= IlluminationModel::unknown;
+
+	// todo: use std::optional
+	std::string ambient = "";
+	std::string diffuse = "";
+	std::string specular = "";
+	std::string specularHighlight = "";
+	std::string alpha = "";
+	std::string bumpMap = "";
+	std::string displacement = "";
+	std::string stencilDecal = "";
+};
+
 class ObjParser
 {
 private:
@@ -26,6 +55,9 @@ private:
 	// material definitions
 	std::vector<std::string>			mtlFiles_;
 	std::vector<std::string>			mtlNames_;
+
+	std::vector<Material>				materials_;
+	void ObjParser::readMtlLibrary(const string& libPath);
 
 	// grouping, unused by this application until I find some use for it
 	std::vector<std::string>			mtlGroupNames_;

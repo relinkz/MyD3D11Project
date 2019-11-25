@@ -126,6 +126,21 @@ void ObjParser::generateFaceElements(const stringContainer& faceList)
 	}
 }
 
+void ObjParser::readMtlLibrary(const string& libPath)
+{
+	stringContainer rawFileDataMtl;
+
+	try 
+	{ 
+		rawFileDataMtl = storeFileAsString(libPath); 
+	}
+	catch (const string msg) 
+	{
+		cout << msg << endl;
+		assert(false);
+	}
+}
+
 ObjParser::ObjParser(const string& src)
 {
 	using namespace chrono;
@@ -153,6 +168,13 @@ ObjParser::ObjParser(const string& src)
 		mtlNames_					= fetchAllStringsOfType("usemtl ", rawFileData);
 		mtlGroupNames_				= fetchAllStringsOfType("g ", rawFileData);
 		mtlSmoothShading_			= fetchAllStringsOfType("s ", rawFileData);
+
+		for (const std::string& mtl : mtlFiles_)
+		{
+			size_t slicePos = src.find_last_of('/');
+			const std::string path = src.substr(0, slicePos) + '/' + mtl;
+
+		}
 	}
 	catch (const string msg)
 	{
