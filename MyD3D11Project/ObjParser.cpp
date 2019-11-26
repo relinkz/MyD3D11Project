@@ -116,7 +116,7 @@ FaceElement ObjParser::getFaceVertex(const std::string& desc) const
 	return element;
 }
 
-void ObjParser::generateFaceElements(const stringContainer& faceList)
+void ObjParser::generateFaceElements(const std::vector<std::string>& faceList)
 {
 	for (const string& face : faceList)
 	{
@@ -126,7 +126,31 @@ void ObjParser::generateFaceElements(const stringContainer& faceList)
 	}
 }
 
-void ObjParser::readMtlLibrary1(const string& libPath) const
+static std::vector<stringContainer> splitByMaterials(const stringContainer& rawFile)
+{
+	stringContainer materials = fetchAllStringsOfType("newmtl ", rawFile);
+	vector<stringContainer> toReturn;
+
+	size_t walker = 0;
+
+	while (walker < rawFile.size())
+	{
+		if (rawFile[walker].find(materials.front()) != string::npos)
+		{
+			toReturn.push_back(stringContainer());
+			toReturn.back().push_back(rawFile[walker]);
+		}
+		else if (!toReturn.empty())
+		{
+			toReturn.back().push_back(rawFile[walker]);
+		}
+		walker++;
+	}
+
+	return toReturn;
+}
+
+void ObjParser::readMtlLibrary(const string& libPath) const
 {
 	stringContainer rawFileDataMtl;
 
@@ -139,6 +163,9 @@ void ObjParser::readMtlLibrary1(const string& libPath) const
 		cout << msg << endl;
 		assert(false);
 	}
+
+	vector<stringContainer> splitted = splitByMaterials(rawFileDataMtl);
+
 }
 
 ObjParser::ObjParser(const string& src)
@@ -174,6 +201,7 @@ ObjParser::ObjParser(const string& src)
 			size_t slicePos = src.find_last_of('/');
 			const std::string path = src.substr(0, slicePos) + '/' + mtl;
 
+			readMtlLibrary(path);
 		}
 	}
 	catch (const string msg)
