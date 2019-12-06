@@ -133,7 +133,7 @@ TEST(ObjParser, generateFacesSampleLast)
 	ASSERT_EQ(expected.vn_.w, faceElem.back().vn_.w);
 }
 
-TEST(ObjParser, mtlTest)
+TEST(ObjParser, ObjMtlData)
 {
 	ObjParser test("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11_Tests/crate1.obj");
 
@@ -146,4 +146,86 @@ TEST(ObjParser, mtlTest)
 	ASSERT_EQ(expectedMtlGroupNames,		test.getMtlGroupNames());
 	ASSERT_EQ(expectedMtlNames,				test.getMtlNames());
 	ASSERT_EQ(expectedMtlSmoothShadings,	test.getMtlSmoothShading());
+}
+
+TEST(ObjParser, mtlSplitter)
+{
+	stringContainer mtlFile
+	{
+		"newmtl M_crate1_blinn",
+		"illum 4",
+		"Kd 0.00 0.00 0.00",
+		"Ka 0.00 0.00 0.00",
+		"Tf 1.00 1.00 1.00",
+		"map_Kd T_crate1_D.tga",
+		"bump T_crate1_N.tga - bm T_crate1_N.tga",
+		"Ni 1.00",
+		"Ks 0.50 0.50 0.50",
+		"map_Ks T_crate1_S.tga"
+	};
+
+	std::vector<stringContainer> expected;
+	expected.push_back(mtlFile);
+
+	ASSERT_EQ(expected, splitByMaterials(mtlFile));
+}
+
+TEST(ObjParser, mtlSplitter2)
+{
+	stringContainer mtlFile
+	{
+		"newmtl M_crate1_blinn",
+		"illum 4",
+		"Kd 0.00 0.00 0.00",
+		"Ka 0.00 0.00 0.00",
+		"Tf 1.00 1.00 1.00",
+		"map_Kd T_crate1_D.tga",
+		"bump T_crate1_N.tga - bm T_crate1_N.tga",
+		"Ni 1.00",
+		"Ks 0.50 0.50 0.50",
+		"map_Ks T_crate1_S.tga",
+		"newmtl M_crate2_blinn",
+		"illum 4",
+		"Kd 0.00 0.00 0.00",
+		"Ka 0.00 0.00 0.00",
+		"Tf 1.00 1.00 1.00",
+		"map_Kd T_crate1_D.tga",
+		"bump T_crate1_N.tga - bm T_crate1_N.tga",
+		"Ni 1.00",
+		"Ks 0.50 0.50 0.50",
+		"map_Ks T_crate1_S.tga"
+	};
+
+	stringContainer exp1
+	{
+		"newmtl M_crate1_blinn",
+		"illum 4",
+		"Kd 0.00 0.00 0.00",
+		"Ka 0.00 0.00 0.00",
+		"Tf 1.00 1.00 1.00",
+		"map_Kd T_crate1_D.tga",
+		"bump T_crate1_N.tga - bm T_crate1_N.tga",
+		"Ni 1.00",
+		"Ks 0.50 0.50 0.50",
+		"map_Ks T_crate1_S.tga"
+	};	
+	stringContainer exp2
+	{
+		"newmtl M_crate2_blinn",
+		"illum 4",
+		"Kd 0.00 0.00 0.00",
+		"Ka 0.00 0.00 0.00",
+		"Tf 1.00 1.00 1.00",
+		"map_Kd T_crate1_D.tga",
+		"bump T_crate1_N.tga - bm T_crate1_N.tga",
+		"Ni 1.00",
+		"Ks 0.50 0.50 0.50",
+		"map_Ks T_crate1_S.tga"
+	};
+
+	std::vector<stringContainer> expected;
+	expected.push_back(exp1);
+	expected.push_back(exp2);
+
+	ASSERT_EQ(expected, splitByMaterials(mtlFile));
 }

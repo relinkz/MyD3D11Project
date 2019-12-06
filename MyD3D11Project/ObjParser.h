@@ -17,6 +17,7 @@ enum IlluminationModel
 	colorOnAmbientOff,
 	colorOnAmbientOn,
 	highlightOn,
+	reflectionOnRaytraceOn,
 	unknown
 };
 
@@ -31,14 +32,14 @@ struct Material
 	IlluminationModel	illuminationModel_	= IlluminationModel::unknown;
 
 	// todo: use std::optional
-	std::string ambient = "";
-	std::string diffuse = "";
-	std::string specular = "";
-	std::string specularHighlight = "";
-	std::string alpha = "";
-	std::string bumpMap = "";
-	std::string displacement = "";
-	std::string stencilDecal = "";
+	std::string ambient_ = "";
+	std::string diffuse_ = "";
+	std::string specular_ = "";
+	std::string specularHighlight_ = "";
+	std::string alpha_ = "";
+	std::string bumpMap_ = "";
+	std::string displacement_ = "";
+	std::string stencilDecal_ = "";
 };
 
 class ObjParser
@@ -49,6 +50,7 @@ private:
 	std::vector<std::array<float, 3>>	textureCoordinates_;
 	std::vector<std::array<float, 3>>	parameterSpaceVertices_;
 
+	UINT								nrOfFaces_;
 	std::vector<FaceElement>			faceElements_;
 	void								generateFaceElements(const std::vector<std::string>& faceList);
 
@@ -78,7 +80,8 @@ public:
 	std::vector<std::array<float, 3>> getParameterSpaceVertices()	const { return parameterSpaceVertices_; }
 
 	// get faceVertex described by string, "vIndex/vtIndex/vnIndex/" example: "1/1/1"
-	FaceElement getFaceVertex(const std::string& desc) const;
+	FaceElement getFaceVertex(const std::string& desc)	const;
+	UINT getNrOfFaces()									const { return nrOfFaces_; }
 	
 	std::vector<FaceElement> getFaceElements()		const { return faceElements_; }
 	std::vector<std::string> getMtlFiles()			const { return mtlFiles_; }

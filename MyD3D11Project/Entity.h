@@ -37,6 +37,8 @@ private:
 	std::vector<std::string>		m_mtlObjects;
 	std::map<const std::string, const DirectX::XMMATRIX> m_materials;
 
+	UINT m_faceElements = 0;
+
 	bool readFromFile(const std::string& dir);
 	void handleObjfile(const std::string& dir);
 	void handleMtlfile(const std::string& path);
@@ -49,13 +51,13 @@ public:
 	Entity(const std::string& dir);
 	virtual ~Entity();
 
-	VertexData getVertexDescription() const;
+	VertexData getVertexDescription();
 	DirectX::XMMATRIX getTransform(const DirectX::XMFLOAT3& scale, const DirectX::XMFLOAT3& angle, const DirectX::XMFLOAT3& translate) const;
 	
 	size_t getNrOfVertices()	const;
 	size_t getNrOfNormals()		const;
 	size_t getNrOfMtlObj()		const;
-	size_t getNrOfFaces()		const;
+	UINT getNrOfFaces()		const;
 
 	static UINT sizeOfVertex();
 };

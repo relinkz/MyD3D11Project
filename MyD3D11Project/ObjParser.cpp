@@ -102,6 +102,7 @@ FaceElement ObjParser::getFaceVertex(const std::string& desc) const
 	element.vt_ = DirectX::XMFLOAT4(0, 0, 0, 0);
 	element.vn_ = DirectX::XMFLOAT4(0, 0, 0, 0);
 
+	// I needto support 1//1
 	stringContainer indexes = splitStringByCharacter(desc, '/');
 	
 	// obj is starting from 1, so I need to offset that
@@ -132,19 +133,37 @@ static std::vector<stringContainer> splitByMaterials(const stringContainer& rawF
 	vector<stringContainer> toReturn;
 
 	size_t walker = 0;
+	size_t processingMaterial = 0;
 
 	while (walker < rawFile.size())
 	{
-		if (rawFile[walker].find(materials.front()) != string::npos)
+		if (rawFile[walker].find(materials[processingMaterial]) != string::npos)
 		{
 			toReturn.push_back(stringContainer());
 			toReturn.back().push_back(rawFile[walker]);
+			if (processingMaterial < materials.size() - 1)
+			{
+				processingMaterial++;
+			}
 		}
 		else if (!toReturn.empty())
 		{
 			toReturn.back().push_back(rawFile[walker]);
 		}
 		walker++;
+	}
+
+	return toReturn;
+}
+
+static Material stringToMaterial(const stringContainer& rawString)
+{
+	Material toReturn;
+
+	stringContainer holder = fetchAllStringsOfType("illum ", rawString);
+	if (!holder.empty())
+	{
+		//toReturn.illuminationModel_ = IlluminationModel(stoi(holder.front())); // this should be cast to unknown
 	}
 
 	return toReturn;
@@ -165,13 +184,11 @@ void ObjParser::readMtlLibrary(const string& libPath) const
 	}
 
 	vector<stringContainer> splitted = splitByMaterials(rawFileDataMtl);
-
+	stringToMaterial(splitted.front());
 }
 
 ObjParser::ObjParser(const string& src)
 {
-	using namespace chrono;
-
 	try
 	{
 		const stringContainer rawFileData = storeFileAsString(src);
@@ -189,6 +206,7 @@ ObjParser::ObjParser(const string& src)
 		parameterSpaceVertices_		= toFloat3Vector(vp);
 		
 		const stringContainer f		= fetchAllStringsOfType("f ",	rawFileData);
+		nrOfFaces_ = f.size();
 		generateFaceElements(f);
 
 		mtlFiles_					= fetchAllStringsOfType("mtllib ", rawFileData);
@@ -196,13 +214,13 @@ ObjParser::ObjParser(const string& src)
 		mtlGroupNames_				= fetchAllStringsOfType("g ", rawFileData);
 		mtlSmoothShading_			= fetchAllStringsOfType("s ", rawFileData);
 
-		for (const std::string& mtl : mtlFiles_)
+		/*for (const std::string& mtl : mtlFiles_)
 		{
 			size_t slicePos = src.find_last_of('/');
 			const std::string path = src.substr(0, slicePos) + '/' + mtl;
 
 			readMtlLibrary(path);
-		}
+		}*/
 	}
 	catch (const string msg)
 	{

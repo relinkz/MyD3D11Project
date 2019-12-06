@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Entity.h"
+#include "ObjParser.h"
 #include <fstream>
 
 static DirectX::XMFLOAT3 stringVector(const std::string& data)
@@ -42,6 +43,7 @@ static std::string stringPick(const std::string& line)
 void Entity::handleObjfile(const std::string& path)
 {
 	std::ifstream modelfile(path.c_str());
+
 
 	// todo Exception?
 	if (!modelfile.is_open())
@@ -268,8 +270,9 @@ Entity::~Entity()
 {
 }
 
-VertexData Entity::getVertexDescription() const
+VertexData Entity::getVertexDescription()
 {
+
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
@@ -281,7 +284,6 @@ VertexData Entity::getVertexDescription() const
 	D3D11_SUBRESOURCE_DATA initData;
 	ZeroMemory(&initData, sizeof(initData));
 	initData.pSysMem = m_faces.data();
-
 	VertexData data;
 	data.desc = bd;
 	data.subdata = initData;
@@ -322,7 +324,7 @@ size_t Entity::getNrOfNormals() const
 	return m_norm.size();
 }
 
-size_t Entity::getNrOfFaces() const
+UINT Entity::getNrOfFaces() const
 {
 	return m_faceDesc.size();
 }
