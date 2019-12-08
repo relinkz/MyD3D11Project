@@ -12,6 +12,13 @@ struct FaceElement
 	DirectX::XMFLOAT4 vn_;
 };
 
+struct FaceParser
+{
+	FaceElement a;
+	FaceElement b;
+	FaceElement c;
+};
+
 enum IlluminationModel
 {
 	colorOnAmbientOff,
@@ -50,7 +57,7 @@ private:
 	std::vector<std::array<float, 3>>	textureCoordinates_;
 	std::vector<std::array<float, 3>>	parameterSpaceVertices_;
 
-	UINT								nrOfFaces_;
+	size_t								nrOfFaces_;
 	std::vector<FaceElement>			faceElements_;
 	void								generateFaceElements(const std::vector<std::string>& faceList);
 
@@ -67,8 +74,8 @@ private:
 
 public:
 	ObjParser(const std::string& src);
-	ObjParser() = default;
-	~ObjParser() = default;
+	ObjParser();
+	~ObjParser();
 
 	//List of geometric vertices, with (x, y, z [,w]) coordinates, w is optional and defaults to 1.0.
 	std::vector<std::array<float, 4>> getGeometricVerticies()		const { return geometricVertices_; }
@@ -81,13 +88,15 @@ public:
 
 	// get faceVertex described by string, "vIndex/vtIndex/vnIndex/" example: "1/1/1"
 	FaceElement getFaceVertex(const std::string& desc)	const;
-	UINT getNrOfFaces()									const { return nrOfFaces_; }
+	
+	size_t getNrOfFaces()							const { return nrOfFaces_; }
+	// returns the number of vertex used by the pipeline, vertex shader
+	size_t getNrOfFaceElements()						const { return faceElements_.size(); }
 	
 	std::vector<FaceElement> getFaceElements()		const { return faceElements_; }
 	std::vector<std::string> getMtlFiles()			const { return mtlFiles_; }
 	std::vector<std::string> getMtlNames()			const { return mtlNames_; }
 	std::vector<std::string> getMtlGroupNames()		const { return mtlGroupNames_; }
 	std::vector<std::string> getMtlSmoothShading()	const { return mtlSmoothShading_; }
-
 };
 

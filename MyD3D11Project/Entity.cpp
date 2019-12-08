@@ -276,6 +276,7 @@ VertexData Entity::getVertexDescription()
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
+	// how many vertecies we are slappin in to the pipeline
 	bd.ByteWidth = sizeof(Face) * m_faces.size();
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
@@ -314,22 +315,7 @@ DirectX::XMMATRIX Entity::getTransform(const DirectX::XMFLOAT3& scale, const Dir
 	return (scaleMatrix * rotationMatrix * translationMatrix);
 }
 
-size_t Entity::getNrOfVertices() const
-{
-	return m_pos.size();
-}
-
-size_t Entity::getNrOfNormals() const
-{
-	return m_norm.size();
-}
-
 UINT Entity::getNrOfFaces() const
 {
 	return m_faceDesc.size();
-}
-
-size_t Entity::getNrOfMtlObj() const
-{
-	return m_mtlObjects.size();
 }

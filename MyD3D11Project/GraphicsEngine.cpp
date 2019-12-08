@@ -14,6 +14,10 @@ struct ConstantBuffer
 	DirectX::XMFLOAT4 mLightColor;
 };
 
+GraphicsEngine::GraphicsEngine()
+{
+}
+
 GraphicsEngine::~GraphicsEngine()
 {
 	if (m_sc)
@@ -204,7 +208,7 @@ HRESULT GraphicsEngine::setInputLayout()
 	{
 		{ "POSITION",	0,	DXGI_FORMAT_R32G32B32_FLOAT,	0,	0,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR",		0,	DXGI_FORMAT_R32G32B32A32_FLOAT, 0,	12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL",		0,	DXGI_FORMAT_R32G32B32_FLOAT,	0,	28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL",		0,	DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	UINT numElements = ARRAYSIZE(layout);
@@ -275,10 +279,31 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 {
 	HRESULT hr = S_OK;
 
-	ID3D11Buffer*			m_vertexBuffer;
+	m_parser = ObjParser("C:/Users/seblu/source/repos/MyD3D11Project/MyD3D11Project/cube.obj");
+
+	// create vertexDescription here instead
+	D3D11_BUFFER_DESC bd;
+	ZeroMemory(&bd, sizeof(bd));
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.ByteWidth = sizeof(FaceParser) * m_parser.getNrOfFaceElements();
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = 0;
+	bd.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA initData;
+	ZeroMemory(&initData, sizeof(initData));
+	initData.pSysMem = m_parser.getFaceElements().data();
 
 	VertexData test = m_entity.getVertexDescription();
-	hr = m_device->CreateBuffer(&test.desc, &test.subdata, &m_vertexBuffer);
+	try 
+	{
+		//hr = m_device->CreateBuffer(&bd, &initData, &m_vertexBuffer);
+		hr = m_device->CreateBuffer(&test.desc, &test.subdata, &m_vertexBuffer);
+	}
+	catch (char* e)
+	{
+		assert(false);
+	}
 
 	if (FAILED(hr))
 	{
@@ -286,6 +311,8 @@ HRESULT GraphicsEngine::createAndSetVertexBuffer()
 	}
 
 	UINT stride = Entity::sizeOfVertex();
+	// UINT stride = sizeof(FaceElement);
+
 	UINT offset = 0;
 
 	m_deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
@@ -372,7 +399,8 @@ void GraphicsEngine::renderEntities()
 	cb.mWorld = DirectX::XMMatrixTranspose(m_entity.getTransform(scale, rotation, translate));
 
 	m_deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);
-	m_deviceContext->Draw(3 * m_entity.getNrOfFaces(), 0);
+	//m_deviceContext->Draw(3 * m_entity.getNrOfFaces(), 0);
+	m_deviceContext->Draw(3 * m_parser.getNrOfFaces(), 0);
 }
 
 void GraphicsEngine::setupMatrixes()

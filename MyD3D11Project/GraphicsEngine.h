@@ -3,10 +3,12 @@
 
 #include "Entity.h"
 #include "Camera.h"
+#include "ObjParser.h"
 
 class GraphicsEngine
 {
 public:
+	GraphicsEngine();
 	virtual ~GraphicsEngine();
 
 	void Init(HWND &hWnd);
@@ -21,6 +23,8 @@ protected:
 	ID3D11RenderTargetView* m_rtw;
 	ID3D11Buffer*			m_constantBuffer;
 
+	ID3D11Buffer*			m_vertexBuffer = nullptr;
+
 	ID3D10Blob*				m_VSBlob;
 	ID3D10Blob*				m_PSBlob;
 
@@ -29,6 +33,7 @@ protected:
 
 	// worldMatixes, temp solution
 	Entity m_entity;
+	ObjParser m_parser;
 
 	Camera m_cam;
 	float m_orbitRot;

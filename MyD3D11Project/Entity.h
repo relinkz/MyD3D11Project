@@ -54,11 +54,7 @@ public:
 	VertexData getVertexDescription();
 	DirectX::XMMATRIX getTransform(const DirectX::XMFLOAT3& scale, const DirectX::XMFLOAT3& angle, const DirectX::XMFLOAT3& translate) const;
 	
-	size_t getNrOfVertices()	const;
-	size_t getNrOfNormals()		const;
-	size_t getNrOfMtlObj()		const;
 	UINT getNrOfFaces()		const;
-
 	static UINT sizeOfVertex();
 };
 

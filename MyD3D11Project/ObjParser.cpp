@@ -228,3 +228,11 @@ ObjParser::ObjParser(const string& src)
 		assert(false);
 	}
 }
+
+ObjParser::ObjParser()
+{
+}
+
+ObjParser::~ObjParser()
+{
+}
